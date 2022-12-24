@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "vector": "cpp",
+    "xstring": "cpp",
+    "forward_list": "cpp",
+    "future": "cpp",
+    "list": "cpp",
+    "xhash": "cpp",
+    "ostream": "cpp"
+  }
+}

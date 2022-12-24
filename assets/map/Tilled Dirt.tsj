@@ -1,0 +1,14 @@
+{ "columns":8,
+ "image":"..\/..\/..\/..\/..\/..\/home\/Downloads\/Compressed\/Sprout Lands - Sprites - Basic pack\/Sprout Lands - Sprites - Basic pack\/Tilesets\/ground tiles\/old tiles\/Tilled Dirt.png",
+ "imageheight":128,
+ "imagewidth":128,
+ "margin":0,
+ "name":"Tilled Dirt",
+ "spacing":0,
+ "tilecount":64,
+ "tiledversion":"1.9.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.9"
+}

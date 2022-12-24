@@ -1,0 +1,14 @@
+{ "columns":5,
+ "image":"..\/..\/..\/..\/..\/..\/home\/Downloads\/Compressed\/Sprout Lands - Sprites - Basic pack\/Sprout Lands - Sprites - Basic pack\/Objects\/Wood Bridge.png",
+ "imageheight":48,
+ "imagewidth":80,
+ "margin":0,
+ "name":"Wood Bridge",
+ "spacing":0,
+ "tilecount":15,
+ "tiledversion":"1.9.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.9"
+}
