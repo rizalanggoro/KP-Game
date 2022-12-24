@@ -102,12 +102,13 @@ class Tilemap {
     for (int h = 0; h < height; h++) {
       for (int w = 0; w < width; w++) {
         // todo: draw water
-        Sprite spriteWater{};
-        spriteWater.setTexture(
-            this->asset->getVectorWater()->at(currWaterIndex));
-        spriteWater.setPosition(16 * w, 16 * h);
+        {
+          Sprite sprite{};
+          sprite.setTexture(this->asset->getVectorWater()->at(currWaterIndex));
+          sprite.setPosition(16 * w, 16 * h);
 
-        window.draw(spriteWater);
+          window.draw(sprite);
+        }
 
         // todo: draw grass
         {

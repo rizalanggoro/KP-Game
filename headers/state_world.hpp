@@ -25,39 +25,60 @@ class StateWorld {
 
   Vector2i playerRealPos;
 
-  // RectangleShape rectColliderUp{}, rectColliderDown{}, rectColliderRight{},
-  //     rectColliderLeft{};
-
   void handleKeyboard() {
     // todo: handle two direction move
     if (Keyboard::isKeyPressed(Keyboard::Down) &&
         Keyboard::isKeyPressed(Keyboard::Left)) {
-      if (this->tilemap.canMove(this->player, 0) &&
-          this->tilemap.canMove(this->player, 2)) {
-        auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto canMoveDown = this->tilemap.canMove(this->player, 0);
+      auto canMoveLeft = this->tilemap.canMove(this->player, 2);
+
+      if (canMoveDown && canMoveLeft)
         this->view.move(-speed, speed);
-      }
+      else if (canMoveDown)
+        this->view.move(0, speed);
+      else if (canMoveLeft)
+        this->view.move(-speed, 0);
+
     } else if (Keyboard::isKeyPressed(Keyboard::Down) &&
                Keyboard::isKeyPressed(Keyboard::Right)) {
-      if (this->tilemap.canMove(this->player, 0) &&
-          this->tilemap.canMove(this->player, 3)) {
-        auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto canMoveDown = this->tilemap.canMove(this->player, 0);
+      auto canMoveRight = this->tilemap.canMove(this->player, 3);
+
+      if (canMoveDown && canMoveRight)
         this->view.move(speed, speed);
-      }
+      else if (canMoveDown)
+        this->view.move(0, speed);
+      else if (canMoveRight)
+        this->view.move(speed, 0);
+
     } else if (Keyboard::isKeyPressed(Keyboard::Up) &&
                Keyboard::isKeyPressed(Keyboard::Left)) {
-      if (this->tilemap.canMove(this->player, 1) &&
-          this->tilemap.canMove(this->player, 2)) {
-        auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto canMoveUp = this->tilemap.canMove(this->player, 1);
+      auto canMoveLeft = this->tilemap.canMove(this->player, 2);
+
+      if (canMoveUp && canMoveLeft)
         this->view.move(-speed, -speed);
-      }
+      else if (canMoveUp)
+        this->view.move(0, -speed);
+      else if (canMoveLeft)
+        this->view.move(-speed, 0);
+
     } else if (Keyboard::isKeyPressed(Keyboard::Up) &&
                Keyboard::isKeyPressed(Keyboard::Right)) {
-      if (this->tilemap.canMove(this->player, 1) &&
-          this->tilemap.canMove(this->player, 3)) {
-        auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto speed = sqrt(2) * this->player.getVelocity() / 2;
+      auto canMoveUp = this->tilemap.canMove(this->player, 1);
+      auto canMoveRight = this->tilemap.canMove(this->player, 3);
+
+      if (canMoveUp && canMoveRight)
         this->view.move(speed, -speed);
-      }
+      else if (canMoveUp)
+        this->view.move(0, -speed);
+      else if (canMoveRight)
+        this->view.move(speed, 0);
+
     }
 
     // todo: handle one direction move
@@ -127,7 +148,6 @@ class StateWorld {
     tilemap.draw(window);
 
     // todo: draw sprite player
-    // window.setView(window.getDefaultView());
     auto winCenter = window.getView().getCenter();
     auto playerGlobalBounds = this->player.getSpritePlayer()->getGlobalBounds();
     this->player.getSpritePlayer()->setPosition(
@@ -139,30 +159,6 @@ class StateWorld {
     this->enemy.draw(window);
 
     // todo: draw tree
-
-    // // todo: draw tilemap collider
-    // View viewCollider = window.getDefaultView();
-    // window.setView(viewCollider);
-
-    // auto colliderWSize = window.getSize();
-
-    // rectColliderUp.setSize(Vector2f(colliderWSize.x, 32));
-    // rectColliderDown.setSize(Vector2f(colliderWSize.x, 32));
-    // rectColliderRight.setSize(Vector2f(32, colliderWSize.x));
-    // rectColliderLeft.setSize(Vector2f(32, colliderWSize.x));
-
-    // rectColliderUp.setFillColor(Color(255, 0, 0, 50));
-    // rectColliderDown.setFillColor(Color(255, 0, 0, 50));
-    // rectColliderRight.setFillColor(Color(255, 0, 0, 50));
-    // rectColliderLeft.setFillColor(Color(255, 0, 0, 50));
-
-    // rectColliderDown.setPosition(0, colliderWSize.y - 32);
-    // rectColliderRight.setPosition(colliderWSize.x - 32, 0);
-
-    // window.draw(rectColliderUp);
-    // window.draw(rectColliderDown);
-    // window.draw(rectColliderRight);
-    // window.draw(rectColliderLeft);
   }
 };
 

@@ -43,13 +43,13 @@ class Player {
  public:
   Player(Asset *asset) { this->asset = asset; }
 
-  void moveDown() { this->spritePlayer.move(0, this->velocity); }
+  // void moveDown() { this->spritePlayer.move(0, this->velocity); }
 
-  void moveUp() { this->spritePlayer.move(0, -this->velocity); }
+  // void moveUp() { this->spritePlayer.move(0, -this->velocity); }
 
-  void moveLeft() { this->spritePlayer.move(-this->velocity, 0); }
+  // void moveLeft() { this->spritePlayer.move(-this->velocity, 0); }
 
-  void moveRight() { this->spritePlayer.move(this->velocity, 0); }
+  // void moveRight() { this->spritePlayer.move(this->velocity, 0); }
 
   void draw(RenderWindow &window) {
     this->handleKeyboard();
@@ -69,6 +69,7 @@ class Player {
     spritePlayer.setTexture(this->asset->getVectorCharSpite()
                                 ->at(this->frameDirIndex)
                                 .at(this->isPlayerIdle ? 0 : this->frameIndex));
+    spritePlayer.setColor(Color::Red);
 
     window.draw(spritePlayer);
 
@@ -119,13 +120,6 @@ class Player {
     window.draw(colliderDown);
     window.draw(colliderRight);
     window.draw(colliderLeft);
-
-    // // todo: draw pointer
-    // CircleShape circle{};
-    // circle.setRadius(2);
-    // circle.setFillColor(Color::Red);
-    // circle.setPosition(Vector2f(playerPos.x, playerPos.y - 4));
-    // window.draw(circle);
   }
 
   void handleEvent(Event &event) {
