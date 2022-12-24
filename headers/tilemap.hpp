@@ -17,9 +17,11 @@ using json = nlohmann::json;
 class Tilemap {
  private:
   Asset *asset;
-  // Player *player;
 
-  vector<vector<int>> vectorTilelayer{};
+  vector<int> vectorTilelayerGrass{};
+  vector<int> vectorTilelayerDirt{};
+  vector<int> vectorTilelayerBrigde{};
+  vector<int> vectorTilelayerCollision{};
 
   vector<RectangleShape> vectorCollision{};
 
@@ -31,16 +33,39 @@ class Tilemap {
   float waterInterval = 0;
   int currWaterIndex = 0;
 
-  void loadMapJson();
+  void loadMapJson() {
+    ifstream file("assets/map/game.tmj");
+    json data = json::parse(file);
 
-  void loadCollision() {
-    int colliderIndex = 0;
-    int colliderLayerIndex = 4;
+    height = data["height"].get<int>();
+    width = data["width"].get<int>();
+
+    cout << "map height: " << height << endl;
+    cout << "map width: " << width << endl;
+
+    auto layers = data["layers"];
+    for (auto it = layers.begin(); it != layers.end(); it++) {
+      json layer = it.value();
+      string layerType = layer["type"].get<string>();
+      string layerName = layer["name"].get<string>();
+
+      if (layerType == "tilelayer") {
+        auto layerData = layer["data"].get<vector<int>>();
+        if (layerName == "grass") this->vectorTilelayerGrass = layerData;
+        if (layerName == "dirt") this->vectorTilelayerDirt = layerData;
+        if (layerName == "bridge") this->vectorTilelayerBrigde = layerData;
+        if (layerName == "collision")
+          this->vectorTilelayerCollision = layerData;
+      }
+    }
+  }
+
+  void loadTilelayerCollision() {
+    int index = 0;
     for (int h = 0; h < this->height; h++) {
       for (int w = 0; w < this->width; w++) {
-        int type =
-            this->vectorTilelayer.at(colliderLayerIndex).at(colliderIndex);
-        if (type != 0) {
+        int tileType = this->vectorTilelayerCollision.at(index);
+        if (tileType != 0) {
           RectangleShape rect{};
           rect.setSize(Vector2f(16, 16));
           rect.setFillColor(Color(255, 0, 0, 50));
@@ -48,13 +73,19 @@ class Tilemap {
           this->vectorCollision.push_back(rect);
         }
 
-        colliderIndex++;
+        index++;
       }
     }
   }
 
  public:
-  Tilemap(Asset *asset);
+  Tilemap(Asset *asset) {
+    this->asset = asset;
+
+    loadMapJson();
+    this->loadTilelayerCollision();
+  }
+
   void draw(RenderWindow &window) {
     // todo: water animation
     waterInterval = clockWater.getElapsedTime().asMilliseconds();
@@ -79,30 +110,34 @@ class Tilemap {
         window.draw(spriteWater);
 
         // todo: draw grass
-        int grassFirstGid = 1;
-        int grassType = vectorTilelayer.at(1).at(index);
-        if (grassType != 0) {
-          int grassIndex = grassType - grassFirstGid;
+        {
+          int firstGid = 1;
+          int tileType = this->vectorTilelayerGrass.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
 
-          Sprite spriteGrass{};
-          spriteGrass.setTexture(this->asset->getVectorGrass()->at(grassIndex));
-          spriteGrass.setPosition(16 * w, 16 * h);
+            Sprite srpite{};
+            srpite.setTexture(this->asset->getVectorGrass()->at(tileIndex));
+            srpite.setPosition(16 * w, 16 * h);
 
-          window.draw(spriteGrass);
+            window.draw(srpite);
+          }
         }
 
         // todo: draw bridge
-        int bridgeFirstGid = 78;
-        int bridgeType = vectorTilelayer.at(3).at(index);
-        if (bridgeType != 0) {
-          int bridgeIndex = bridgeType - bridgeFirstGid;
+        {
+          int firstGid = 78;
+          int tileType = this->vectorTilelayerBrigde.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
 
-          Sprite spriteBridge{};
-          spriteBridge.setTexture(
-              this->asset->getVectorWoodBridge()->at(bridgeIndex));
-          spriteBridge.setPosition(16 * w, 16 * h);
+            Sprite sprite{};
+            sprite.setTexture(
+                this->asset->getVectorWoodBridge()->at(tileIndex));
+            sprite.setPosition(16 * w, 16 * h);
 
-          window.draw(spriteBridge);
+            window.draw(sprite);
+          }
         }
 
         index++;
@@ -119,28 +154,6 @@ class Tilemap {
   int getWidth() { return width; }
 
   bool canMove(Player &player, int dir) {
-    // auto gBounds = player.getSpritePlayer()->getGlobalBounds();
-    // auto collUp = player.getColliderUp();
-    // Vector2f collUpPosLeft = collUp->getPosition();
-    // Vector2f collUpPosRight{collUpPosLeft.x + collUp->getSize().x,
-    //                         collUpPosLeft.y};
-
-    // int row = (collUpPosLeft.y / 16) - 1;
-    // int col1 = collUpPosLeft.x / 16;
-    // int col2 = collUpPosRight.x / 16;
-
-    // cout << row << endl;
-    // cout << col1 << endl;
-    // cout << col2 << endl;
-
-    // int count = 0;
-    // for (int c = col1; c <= col2; c++) {
-    //   if (this->vectorCollision.at(c + 30 * row)
-    //           .getGlobalBounds()
-    //           .intersects(collUp->getGlobalBounds()))
-    //     count++;
-    // }
-
     RectangleShape *playerCollider = NULL;
     if (dir == 0) playerCollider = player.getColliderDown();
     if (dir == 1) playerCollider = player.getColliderUp();
@@ -151,7 +164,6 @@ class Tilemap {
     for (int a = 0; a < this->vectorCollision.size(); a++) {
       if (this->vectorCollision.at(a).getGlobalBounds().intersects(
               playerCollider->getGlobalBounds())) {
-        // cout << "intersect" << endl;
         count++;
       }
     }
