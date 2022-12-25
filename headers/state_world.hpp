@@ -18,9 +18,9 @@ class StateWorld {
   View view;
   RenderWindow *window;
 
-  Asset *asset;
-  Player player{asset};
-  Tilemap tilemap{asset};
+  Asset asset{};
+  Player player{&asset};
+  Tilemap tilemap{&asset};
   // Enemy enemy{&player, Vector2f(27 * 16, 15 * 16)};
 
   Vector2i playerRealPos;
@@ -98,10 +98,9 @@ class StateWorld {
   }
 
  public:
-  StateWorld(string *state, RenderWindow *window, Asset *asset) {
+  StateWorld(string *state, RenderWindow *window) {
     this->state = state;
     this->window = window;
-    this->asset = asset;
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
