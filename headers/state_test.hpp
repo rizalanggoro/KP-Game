@@ -15,8 +15,8 @@ class StateTest {
   string *state;
   View view{};
 
-  Asset asset{};
-  Player player{&asset};
+  Asset *asset;
+  Player player{asset};
   RectangleShape test{};
 
   void handleKeyboard() {
@@ -27,8 +27,9 @@ class StateTest {
   }
 
  public:
-  StateTest(string *state, RenderWindow *window) {
+  StateTest(string *state, RenderWindow *window, Asset *asset) {
     this->state = state;
+    this->asset = asset;
     // this->view = view;
 
     view = window->getDefaultView();

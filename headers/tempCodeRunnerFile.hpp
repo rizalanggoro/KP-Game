@@ -1,2 +1,0 @@
-RealPos =
-        window.mapCoordsTo

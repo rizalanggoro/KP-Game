@@ -18,10 +18,10 @@ class StateWorld {
   View view;
   RenderWindow *window;
 
-  Asset asset{};
-  Player player{&asset};
-  Tilemap tilemap{&asset};
-  Enemy enemy{&player, Vector2f(27 * 16, 15 * 16)};
+  Asset *asset;
+  Player player{asset};
+  Tilemap tilemap{asset};
+  // Enemy enemy{&player, Vector2f(27 * 16, 15 * 16)};
 
   Vector2i playerRealPos;
 
@@ -98,13 +98,14 @@ class StateWorld {
   }
 
  public:
-  StateWorld(string *state, RenderWindow *window) {
+  StateWorld(string *state, RenderWindow *window, Asset *asset) {
     this->state = state;
     this->window = window;
+    this->asset = asset;
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
-    view.zoom(.3);
+    // view.zoom(.3);
 
     // this->player.getSpritePlayer()->setPosition((30 * 16) / 2, (20 * 16) /
     // 2);
@@ -156,7 +157,7 @@ class StateWorld {
     this->player.draw(window);
 
     // todo: draw enemy
-    this->enemy.draw(window);
+    // this->enemy.draw(window);
 
     // todo: draw tree
   }
