@@ -15,7 +15,12 @@ class Asset {
   Texture tilledDirt{};
 
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{};
+
   vector<Texture> vectorBoatColor1{};
+  vector<Texture> vectorCannon1{};
+  vector<Texture> vectorCannon2{};
+  vector<Texture> vectorCannon3{};
+  vector<Texture> vectorCannon4{};
 
   vector<vector<Texture>> vectorCharSpite{};
 
@@ -26,6 +31,7 @@ class Asset {
     loadTextureBasicCharSprite();
 
     this->loadBoat();
+    this->loadCannon();
   }
 
   void loadTextureBasicCharSprite() {
@@ -100,6 +106,29 @@ class Asset {
     }
   }
 
+  void loadCannon() {
+    int count[] = {4, 3, 4, 3};
+    for (int a = 0; a < 4; a++) {
+      for (int b = 1; b <= count[a]; b++) {
+        string path = "assets/images/Cannon";
+        path += to_string(a + 1);
+        path += "_color1/Cannon";
+        path += to_string(a + 1);
+        path += "_color1_";
+        path += to_string(b);
+        path += ".png";
+
+        Texture texture{};
+        if (texture.loadFromFile(path)) cout << path << " loaded!" << endl;
+
+        if (a == 0) this->vectorCannon1.push_back(texture);
+        if (a == 1) this->vectorCannon2.push_back(texture);
+        if (a == 2) this->vectorCannon3.push_back(texture);
+        if (a == 3) this->vectorCannon4.push_back(texture);
+      }
+    }
+  }
+
  public:
   Asset() { loadTexture(); }
 
@@ -109,6 +138,10 @@ class Asset {
   vector<vector<Texture>> *getVectorCharSpite() { return &vectorCharSpite; };
 
   vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
+  vector<Texture> *getVectorCannon1() { return &this->vectorCannon1; }
+  vector<Texture> *getVectorCannon2() { return &this->vectorCannon2; }
+  vector<Texture> *getVectorCannon3() { return &this->vectorCannon3; }
+  vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
 };
 
 #endif
