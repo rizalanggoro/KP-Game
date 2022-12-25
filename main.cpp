@@ -18,7 +18,7 @@ int main() {
 
   // todo: states
   StateTest stateTest{&state, &window, &asset};
-  StateWorld stateWorld{&state, &window, &asset};
+  StateWorld stateWorld{&state, &window};
   StateWar stateWar{&state, &window};
 
   while (window.isOpen()) {

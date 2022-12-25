@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "player_boat.hpp"
 #include "tilemap_war.hpp"
 
 using namespace std;
@@ -17,19 +18,25 @@ class StateWar {
 
   Asset asset{};
   View view{};
-  // Sprite spriteWater{};
-  // int currWaterFrameIndex = 0;
-  // Clock clockWater;
-  // float frameWaterDelay = 250;
-  // float frameWaterInterval = 0;
 
   TilemapWar tilemapWar{&asset};
+  PlayerBoat playerBoat{&asset, &tilemapWar};
+
+  float colliderMapSize = 32;
+  Vector2i playerRealPos;
+
+  // RectangleShape colliderMapUp{}, colliderMapDown{}, colliderMapRight{},
+  //     colliderMapLeft{};
 
   void handleKeyboard() {
-    if (Keyboard::isKeyPressed(Keyboard::Up)) this->view.move(0, -5);
-    if (Keyboard::isKeyPressed(Keyboard::Down)) this->view.move(0, 5);
-    if (Keyboard::isKeyPressed(Keyboard::Right)) this->view.move(5, 0);
-    if (Keyboard::isKeyPressed(Keyboard::Left)) this->view.move(-5, 0);
+    if (Keyboard::isKeyPressed(Keyboard::Up))
+      this->playerBoat.getSprite()->move(0, -5);
+    if (Keyboard::isKeyPressed(Keyboard::Down))
+      this->playerBoat.getSprite()->move(0, 5);
+    if (Keyboard::isKeyPressed(Keyboard::Right))
+      this->playerBoat.getSprite()->move(5, 0);
+    if (Keyboard::isKeyPressed(Keyboard::Left))
+      this->playerBoat.getSprite()->move(-5, 0);
   }
 
  public:
@@ -44,56 +51,50 @@ class StateWar {
                     this->tilemapWar.getHeight() * tileTargetSize / 2);
 
     this->window->setView(this->view);
-
-    // view = window->getDefaultView();
   }
 
   void handleEvent(Event &event) {}
 
   void run(RenderWindow &window) {
+    this->playerRealPos =
+        window.mapCoordsToPixel(this->playerBoat.getSprite()->getPosition());
+    cout << "pos: " << playerRealPos.x << "," << playerRealPos.y << endl;
+
     this->window->setView(this->view);
 
     this->handleKeyboard();
 
-    // window.setView(window.getDefaultView());
-
-    // CircleShape circle{};
-    // circle.setRadius(50);
-    // circle.setFillColor(Color::Red);
-    // window.draw(circle);
-
     this->tilemapWar.draw(window);
+    this->playerBoat.draw(window);
 
-    // todo: handle water frame animation
-    // this->frameWaterInterval =
-    //     this->clockWater.getElapsedTime().asMilliseconds();
+    // todo: draw collider map
+    // auto windowSize = this->window->getSize();
+    // this->colliderMapUp.setSize(Vector2f(windowSize.x,
+    // this->colliderMapSize)); this->colliderMapDown.setSize(
+    //     Vector2f(windowSize.x, this->colliderMapSize));
+    // this->colliderMapRight.setSize(
+    //     Vector2f(this->colliderMapSize, windowSize.y));
+    // this->colliderMapLeft.setSize(
+    //     Vector2f(this->colliderMapSize, windowSize.y));
 
-    // if (this->frameWaterInterval >= this->frameWaterDelay) {
-    //   if (this->currWaterFrameIndex < 3)
-    //     this->currWaterFrameIndex++;
-    //   else
-    //     this->currWaterFrameIndex = 0;
+    // this->colliderMapUp.setFillColor(Color(0, 255, 0, 50));
+    // this->colliderMapDown.setFillColor(Color(0, 255, 0, 50));
+    // this->colliderMapRight.setFillColor(Color(0, 255, 0, 50));
+    // this->colliderMapLeft.setFillColor(Color(0, 255, 0, 50));
 
-    //   this->clockWater.restart();
-    // }
+    // this->colliderMapRight.setPosition(windowSize.x - this->colliderMapSize,
+    // 0); this->colliderMapDown.setPosition(0, windowSize.y -
+    // this->colliderMapSize);
 
-    // auto wSize = window.getSize();
+    // window.setView(window.getDefaultView());
+    // window.draw(this->colliderMapUp);
+    // window.draw(this->colliderMapDown);
+    // window.draw(this->colliderMapRight);
+    // window.draw(this->colliderMapLeft);
 
-    // float tileSize = 64;
-    // auto scaleFactor = tileSize / 16;
-
-    // // todo: draw water
-    // for (int r = 0; r < wSize.y / tileSize; r++) {
-    //   for (int c = 0; c < wSize.x / tileSize; c++) {
-    //     this->spriteWater.setTexture(
-    //         this->asset->getVectorWater()->at(this->currWaterFrameIndex));
-    //     this->spriteWater.setScale(scaleFactor, scaleFactor);
-    //     this->spriteWater.setPosition(16 * c * scaleFactor,
-    //                                   16 * r * scaleFactor);
-
-    //     window.draw(this->spriteWater);
-    //   }
-    // }
+    // if (this->playerBoat.getSprite()->getGlobalBounds().intersects(
+    //         this->colliderMapUp.getGlobalBounds()))
+    //   cout << "oke" << endl;
   }
 };
 

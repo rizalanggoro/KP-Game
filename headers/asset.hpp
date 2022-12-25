@@ -15,6 +15,8 @@ class Asset {
   Texture tilledDirt{};
 
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{};
+  vector<Texture> vectorBoatColor1{};
+
   vector<vector<Texture>> vectorCharSpite{};
 
   void loadTexture() {
@@ -22,6 +24,8 @@ class Asset {
     loadTextureWater();
     loadTextureBridge();
     loadTextureBasicCharSprite();
+
+    this->loadBoat();
   }
 
   void loadTextureBasicCharSprite() {
@@ -80,6 +84,22 @@ class Asset {
     }
   }
 
+  void loadBoat() {
+    // todo: load boat color 1
+    for (int a = 1; a <= 4; a++) {
+      string path = "assets/images/Boats_color1/Boat_color1_";
+      path += to_string(a);
+      path += ".png";
+
+      cout << path << endl;
+
+      Texture texture{};
+      if (texture.loadFromFile(path))
+        cout << "boat color 1 / " << a << " loaded!" << endl;
+      this->vectorBoatColor1.push_back(texture);
+    }
+  }
+
  public:
   Asset() { loadTexture(); }
 
@@ -87,6 +107,8 @@ class Asset {
   vector<Texture> *getVectorGrass() { return &vectorGrass; };
   vector<Texture> *getVectorWoodBridge() { return &vectorWoodBridge; };
   vector<vector<Texture>> *getVectorCharSpite() { return &vectorCharSpite; };
+
+  vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
 };
 
 #endif

@@ -78,6 +78,7 @@ class TilemapWar {
   int getWidth() { return this->width; }
   int getHeight() { return this->height; }
   float getTileTargetSize() { return this->tileTargetSize; }
+  float getScaleFactor() { return this->tileScaleFactor; }
 
   TilemapWar(Asset *asset) {
     this->asset = asset;
