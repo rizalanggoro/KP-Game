@@ -144,7 +144,7 @@ class TilemapWar {
     }
   }
 
-  bool canMove(RectangleShape *rect, string dir) {
+  bool canMove(RectangleShape *rect) {
     int count = 0;
     for (auto collider : this->vectorCollision) {
       if (rect->getGlobalBounds().intersects(collider.getGlobalBounds()))

@@ -2,6 +2,7 @@
 #define player_boat_hpp
 
 #include <SFML/Graphics.hpp>
+#include <cmath>
 #include <iostream>
 
 #include "asset.hpp"
@@ -17,21 +18,60 @@ class PlayerBoat {
   Sprite player{};
 
   float boatSize = 128;
-  float boatTargetSize = 160;
+  float boatTargetSize = 80;
   float boatScaleFactor = 1;
 
   float velocity = 3;
 
+  RectangleShape colliderBox{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
 
  public:
   float getVelocity() { return this->velocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
   Sprite *getSprite() { return &this->player; }
+  RectangleShape *getColliderBox() { return &this->colliderBox; };
   RectangleShape *getColliderUp() { return &this->colliderUp; }
   RectangleShape *getColliderDown() { return &this->colliderDown; }
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
+
+  void moveUpRight() {
+    auto speed = this->velocity * sqrt(2) / 2;
+    this->player.move(speed, -speed);
+    this->player.setRotation(225);
+  }
+  void moveUpLeft() {
+    auto speed = this->velocity * sqrt(2) / 2;
+    this->player.move(-speed, -speed);
+    this->player.setRotation(135);
+  }
+  void moveDownRight() {
+    auto speed = this->velocity * sqrt(2) / 2;
+    this->player.move(speed, speed);
+    this->player.setRotation(315);
+  }
+  void moveDownLeft() {
+    auto speed = this->velocity * sqrt(2) / 2;
+    this->player.move(-speed, speed);
+    this->player.setRotation(45);
+  }
+  void moveUp() {
+    this->player.move(0, -this->velocity);
+    this->player.setRotation(180);
+  }
+  void moveDown() {
+    this->player.move(0, this->velocity);
+    this->player.setRotation(0);
+  }
+  void moveRight() {
+    this->player.move(this->velocity, 0);
+    this->player.setRotation(270);
+  }
+  void moveLeft() {
+    this->player.move(-this->velocity, 0);
+    this->player.setRotation(90);
+  }
 
   PlayerBoat(Asset *asset, TilemapWar *tilemap) {
     this->asset = asset;
@@ -46,20 +86,24 @@ class PlayerBoat {
   }
 
   void draw(RenderWindow &window) {
-    this->player.setTexture(this->asset->getVectorBoatColor1()->at(1));
+    this->player.setTexture(this->asset->getVectorBoatColor1()->at(0));
+    this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
 
     window.draw(this->player);
 
     // todo: draw rect
-    RectangleShape rect{};
-    rect.setFillColor(Color::Transparent);
-    rect.setPosition(this->player.getPosition());
-    rect.setOutlineThickness(-2);
-    rect.setOutlineColor(Color(255, 0, 0, 50));
-    rect.setSize(Vector2f(this->boatTargetSize, this->boatTargetSize));
+    auto playerPos = this->player.getPosition();
 
-    window.draw(rect);
+    this->colliderBox.setFillColor(Color::Transparent);
+    this->colliderBox.setPosition(playerPos.x - this->boatTargetSize / 2,
+                                  playerPos.y - this->boatTargetSize / 2);
+    this->colliderBox.setOutlineThickness(-2);
+    this->colliderBox.setOutlineColor(Color(255, 0, 0, 50));
+    this->colliderBox.setSize(
+        Vector2f(this->boatTargetSize, this->boatTargetSize));
+
+    window.draw(this->colliderBox);
 
     // todo: draw collider
     auto hColliderSize = Vector2f(this->boatTargetSize, this->velocity * 2);
@@ -76,15 +120,15 @@ class PlayerBoat {
     this->colliderRight.setFillColor(colliderColor);
     this->colliderLeft.setFillColor(colliderColor);
 
-    auto playerPos = this->player.getPosition();
+    auto colliderBoxPos = this->colliderBox.getPosition();
     this->colliderUp.setPosition(
-        Vector2f(playerPos.x, playerPos.y - this->velocity * 2));
+        Vector2f(colliderBoxPos.x, colliderBoxPos.y - this->velocity * 2));
     this->colliderDown.setPosition(
-        Vector2f(playerPos.x, playerPos.y + this->boatTargetSize));
+        Vector2f(colliderBoxPos.x, colliderBoxPos.y + this->boatTargetSize));
     this->colliderRight.setPosition(
-        Vector2f(playerPos.x + this->boatTargetSize, playerPos.y));
+        Vector2f(colliderBoxPos.x + this->boatTargetSize, colliderBoxPos.y));
     this->colliderLeft.setPosition(
-        Vector2f(playerPos.x - this->velocity * 2, playerPos.y));
+        Vector2f(colliderBoxPos.x - this->velocity * 2, colliderBoxPos.y));
 
     window.draw(this->colliderUp);
     window.draw(this->colliderDown);
