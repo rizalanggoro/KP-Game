@@ -18,7 +18,8 @@ class TilemapWar {
   Asset *asset;
 
   float tileSize = 16;
-  float tileTargetSize = 48;
+  // float tileTargetSize = 48;
+  float tileTargetSize = 16;
   float tileScaleFactor = 0;
 
   vector<int> vectorTilelayerGrass{}, vectorTilelayerCollision{};

@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "enemy_boat.hpp"
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
 
@@ -21,6 +22,7 @@ class StateWar {
 
   TilemapWar tilemapWar{&asset};
   PlayerBoat playerBoat{&asset, &tilemapWar};
+  EnemyBoat enemyBoat{&asset, &playerBoat};
 
   float colliderMapSize = 32;
   Vector2i playerRealPos;
@@ -119,7 +121,12 @@ class StateWar {
     this->window->setView(this->view);
   }
 
-  void handleEvent(Event &event) {}
+  void handleEvent(Event &event) {
+    if (event.type == Event::Resized) {
+      this->view.setSize(event.size.width, event.size.height);
+      this->window->setView(this->view);
+    }
+  }
 
   void run(RenderWindow &window) {
     this->playerRealPos = window.mapCoordsToPixel(
@@ -130,6 +137,9 @@ class StateWar {
 
     this->tilemapWar.draw(window);
     this->playerBoat.draw(window);
+
+    // todo: draw enemy
+    this->enemyBoat.draw(window);
   }
 };
 
