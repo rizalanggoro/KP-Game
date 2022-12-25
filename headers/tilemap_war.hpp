@@ -7,6 +7,7 @@
 
 #include "asset.hpp"
 #include "json.hpp"
+// #include "player_boat.hpp"
 
 using namespace std;
 using namespace sf;
@@ -141,6 +142,15 @@ class TilemapWar {
     for (int a = 0; a < this->vectorCollision.size(); a++) {
       window.draw(this->vectorCollision.at(a));
     }
+  }
+
+  bool canMove(RectangleShape *rect, string dir) {
+    int count = 0;
+    for (auto collider : this->vectorCollision) {
+      if (rect->getGlobalBounds().intersects(collider.getGlobalBounds()))
+        count++;
+    }
+    return count == 0;
   }
 };
 

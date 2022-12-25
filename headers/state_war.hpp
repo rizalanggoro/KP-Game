@@ -25,18 +25,38 @@ class StateWar {
   float colliderMapSize = 32;
   Vector2i playerRealPos;
 
-  // RectangleShape colliderMapUp{}, colliderMapDown{}, colliderMapRight{},
-  //     colliderMapLeft{};
-
   void handleKeyboard() {
-    if (Keyboard::isKeyPressed(Keyboard::Up))
-      this->playerBoat.getSprite()->move(0, -5);
-    if (Keyboard::isKeyPressed(Keyboard::Down))
-      this->playerBoat.getSprite()->move(0, 5);
-    if (Keyboard::isKeyPressed(Keyboard::Right))
-      this->playerBoat.getSprite()->move(5, 0);
-    if (Keyboard::isKeyPressed(Keyboard::Left))
-      this->playerBoat.getSprite()->move(-5, 0);
+    if (Keyboard::isKeyPressed(Keyboard::Up)) {
+      if (this->tilemapWar.canMove(this->playerBoat.getColliderUp(), "w")) {
+        if (this->playerRealPos.y <= this->colliderMapSize) {
+          this->view.move(0, -5);
+        }
+        this->playerBoat.getSprite()->move(0, -5);
+      }
+    }
+
+    else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+      if (this->tilemapWar.canMove(this->playerBoat.getColliderDown(), "s")) {
+        if (this->playerRealPos.y >= this->window->getSize().y -
+                                         this->playerBoat.getBoatTargetSize() -
+                                         32) {
+          this->view.move(0, 5);
+        }
+        this->playerBoat.getSprite()->move(0, 5);
+      }
+    }
+
+    else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+      if (this->tilemapWar.canMove(this->playerBoat.getColliderRight(), "d")) {
+        this->playerBoat.getSprite()->move(5, 0);
+      }
+    }
+
+    else if (Keyboard::isKeyPressed(Keyboard::Left)) {
+      if (this->tilemapWar.canMove(this->playerBoat.getColliderLeft(), "a")) {
+        this->playerBoat.getSprite()->move(-5, 0);
+      }
+    }
   }
 
  public:
@@ -58,43 +78,12 @@ class StateWar {
   void run(RenderWindow &window) {
     this->playerRealPos =
         window.mapCoordsToPixel(this->playerBoat.getSprite()->getPosition());
-    cout << "pos: " << playerRealPos.x << "," << playerRealPos.y << endl;
-
     this->window->setView(this->view);
 
     this->handleKeyboard();
 
     this->tilemapWar.draw(window);
     this->playerBoat.draw(window);
-
-    // todo: draw collider map
-    // auto windowSize = this->window->getSize();
-    // this->colliderMapUp.setSize(Vector2f(windowSize.x,
-    // this->colliderMapSize)); this->colliderMapDown.setSize(
-    //     Vector2f(windowSize.x, this->colliderMapSize));
-    // this->colliderMapRight.setSize(
-    //     Vector2f(this->colliderMapSize, windowSize.y));
-    // this->colliderMapLeft.setSize(
-    //     Vector2f(this->colliderMapSize, windowSize.y));
-
-    // this->colliderMapUp.setFillColor(Color(0, 255, 0, 50));
-    // this->colliderMapDown.setFillColor(Color(0, 255, 0, 50));
-    // this->colliderMapRight.setFillColor(Color(0, 255, 0, 50));
-    // this->colliderMapLeft.setFillColor(Color(0, 255, 0, 50));
-
-    // this->colliderMapRight.setPosition(windowSize.x - this->colliderMapSize,
-    // 0); this->colliderMapDown.setPosition(0, windowSize.y -
-    // this->colliderMapSize);
-
-    // window.setView(window.getDefaultView());
-    // window.draw(this->colliderMapUp);
-    // window.draw(this->colliderMapDown);
-    // window.draw(this->colliderMapRight);
-    // window.draw(this->colliderMapLeft);
-
-    // if (this->playerBoat.getSprite()->getGlobalBounds().intersects(
-    //         this->colliderMapUp.getGlobalBounds()))
-    //   cout << "oke" << endl;
   }
 };
 
