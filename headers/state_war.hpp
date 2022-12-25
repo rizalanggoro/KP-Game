@@ -28,32 +28,34 @@ class StateWar {
   void handleKeyboard() {
     if (Keyboard::isKeyPressed(Keyboard::Up)) {
       if (this->tilemapWar.canMove(this->playerBoat.getColliderUp(), "w")) {
-        if (this->playerRealPos.y <= this->colliderMapSize) {
+        if (this->playerRealPos.y <= this->colliderMapSize)
           this->view.move(0, -5);
-        }
         this->playerBoat.getSprite()->move(0, -5);
       }
     }
 
     else if (Keyboard::isKeyPressed(Keyboard::Down)) {
       if (this->tilemapWar.canMove(this->playerBoat.getColliderDown(), "s")) {
-        if (this->playerRealPos.y >= this->window->getSize().y -
-                                         this->playerBoat.getBoatTargetSize() -
-                                         32) {
-          this->view.move(0, 5);
-        }
+        auto mapMaxY = this->window->getSize().y -
+                       this->playerBoat.getBoatTargetSize() - 32;
+        if (this->playerRealPos.y >= mapMaxY) this->view.move(0, 5);
         this->playerBoat.getSprite()->move(0, 5);
       }
     }
 
     else if (Keyboard::isKeyPressed(Keyboard::Right)) {
       if (this->tilemapWar.canMove(this->playerBoat.getColliderRight(), "d")) {
+        auto mapMaxX = this->window->getSize().x -
+                       this->playerBoat.getBoatTargetSize() - 32;
+        if (this->playerRealPos.x >= mapMaxX) this->view.move(5, 0);
         this->playerBoat.getSprite()->move(5, 0);
       }
     }
 
     else if (Keyboard::isKeyPressed(Keyboard::Left)) {
       if (this->tilemapWar.canMove(this->playerBoat.getColliderLeft(), "a")) {
+        if (this->playerRealPos.x <= this->colliderMapSize)
+          this->view.move(-5, 0);
         this->playerBoat.getSprite()->move(-5, 0);
       }
     }

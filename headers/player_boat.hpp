@@ -46,7 +46,7 @@ class PlayerBoat {
   }
 
   void draw(RenderWindow &window) {
-    this->player.setTexture(this->asset->getVectorBoatColor1()->at(0));
+    this->player.setTexture(this->asset->getVectorBoatColor1()->at(1));
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
 
     window.draw(this->player);
