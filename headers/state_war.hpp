@@ -27,7 +27,7 @@ class StateWar {
   vector<EnemyBoat> vectorEnemyBoat{};
   Clock clockEnemyBoat;
   float spawnEnemyBoatInterval = 0;
-  float spawnEnemyBoatDelay = 100;
+  float spawnEnemyBoatDelay = 2000;
 
   float colliderMapSize = 32;
   Vector2i playerRealPos;
@@ -147,10 +147,12 @@ class StateWar {
     this->spawnEnemyBoatInterval =
         this->clockEnemyBoat.getElapsedTime().asMilliseconds();
     if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
-      EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
-                             &this->playerBoat};
-      newEnemyBoat.setInitPos(0, 0);
-      this->vectorEnemyBoat.push_back(newEnemyBoat);
+      if (this->vectorEnemyBoat.size() <= 2) {
+        EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
+                               &this->playerBoat};
+        newEnemyBoat.setInitPos(0, 0);
+        this->vectorEnemyBoat.push_back(newEnemyBoat);
+      }
 
       this->clockEnemyBoat.restart();
     }

@@ -41,6 +41,20 @@ class PlayerBoat {
   float frameCannonInterval = 0;
   int currFrameCannonIndex = 0;
 
+  int parseDirection(string dir) {
+    int angle = 0;
+    if (dir == "ur") angle = 225;
+    if (dir == "ul") angle = 135;
+    if (dir == "dr") angle = 315;
+    if (dir == "dl") angle = 45;
+    if (dir == "u") angle = 180;
+    if (dir == "d") angle = 0;
+    if (dir == "r") angle = 270;
+    if (dir == "l") angle = 90;
+
+    return angle;
+  }
+
  public:
   float getVelocity() { return this->velocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
@@ -53,63 +67,39 @@ class PlayerBoat {
 
   void moveUpRight() {
     this->playerDirection = "ur";
-
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(speed, -speed);
-    this->player.setRotation(225);
-    this->playerCannon.setRotation(225);
   }
   void moveUpLeft() {
     this->playerDirection = "ul";
-
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(-speed, -speed);
-    this->player.setRotation(135);
-    this->playerCannon.setRotation(135);
   }
   void moveDownRight() {
     this->playerDirection = "dr";
-
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(speed, speed);
-    this->player.setRotation(315);
-    this->playerCannon.setRotation(315);
   }
   void moveDownLeft() {
     this->playerDirection = "dl";
-
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(-speed, speed);
-    this->player.setRotation(45);
-    this->playerCannon.setRotation(45);
   }
   void moveUp() {
     this->playerDirection = "u";
-
     this->player.move(0, -this->velocity);
-    this->player.setRotation(180);
-    this->playerCannon.setRotation(180);
   }
   void moveDown() {
     this->playerDirection = "d";
-
     this->player.move(0, this->velocity);
-    this->player.setRotation(0);
-    this->playerCannon.setRotation(0);
   }
   void moveRight() {
     this->playerDirection = "r";
-
     this->player.move(this->velocity, 0);
-    this->player.setRotation(270);
-    this->playerCannon.setRotation(270);
   }
   void moveLeft() {
     this->playerDirection = "l";
-
     this->player.move(-this->velocity, 0);
-    this->player.setRotation(90);
-    this->playerCannon.setRotation(90);
   }
 
   void unfire() { this->currFrameCannonIndex = 0; }
@@ -118,7 +108,8 @@ class PlayerBoat {
     this->frameCannonInterval =
         this->clockFrameCannon.getElapsedTime().asMilliseconds();
 
-    if (this->frameCannonInterval >= this->frameCannonDelay) {
+    if (this->frameCannonInterval >=
+        this->frameCannonDelay / this->asset->getVectorCannon4()->size()) {
       if (this->currFrameCannonIndex <
           this->asset->getVectorCannon4()->size() - 1)
         this->currFrameCannonIndex++;
@@ -156,9 +147,10 @@ class PlayerBoat {
   }
 
   void draw(RenderWindow &window) {
-    // todo; draw boat
+    // todo: draw boat
     this->player.setTexture(this->asset->getVectorBoatColor1()->at(0));
     this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
+    this->player.setRotation(this->parseDirection(this->playerDirection));
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
 
     window.draw(this->player);
@@ -168,8 +160,8 @@ class PlayerBoat {
     this->playerCannon.setTexture(
         this->asset->getVectorCannon4()->at(this->currFrameCannonIndex));
     this->playerCannon.setPosition(playerPos.x, playerPos.y);
-
     this->playerCannon.setOrigin(boatCannonSize / 2, boatCannonSize / 2);
+    this->playerCannon.setRotation(this->parseDirection(this->playerDirection));
     this->playerCannon.setScale(this->boatCannonScaleFactor,
                                 this->boatCannonScaleFactor);
 
@@ -224,8 +216,6 @@ class PlayerBoat {
       if (this->tilemap->isFireCollided(fire->getFireCollider()))
         this->vectorFire.erase(this->vectorFire.begin() + a);
     }
-
-    cout << "fire count: " << this->vectorFire.size() << endl;
   }
 };
 
