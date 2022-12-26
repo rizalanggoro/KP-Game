@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "fire.hpp"
 #include "tilemap_war.hpp"
 
 using namespace std;
@@ -17,6 +18,9 @@ class PlayerBoat {
   TilemapWar *tilemap;
   Sprite player{};
   Sprite playerCannon{};
+  vector<Fire> vectorFire{};
+
+  string playerDirection = "d";
 
   float boatSize = 128;
   float boatTargetSize = 80;
@@ -32,6 +36,11 @@ class PlayerBoat {
   RectangleShape colliderBox{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
 
+  Clock clockFrameCannon{};
+  float frameCannonDelay = 250;
+  float frameCannonInterval = 0;
+  int currFrameCannonIndex = 0;
+
  public:
   float getVelocity() { return this->velocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
@@ -43,48 +52,89 @@ class PlayerBoat {
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
 
   void moveUpRight() {
+    this->playerDirection = "ur";
+
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(speed, -speed);
     this->player.setRotation(225);
     this->playerCannon.setRotation(225);
   }
   void moveUpLeft() {
+    this->playerDirection = "ul";
+
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(-speed, -speed);
     this->player.setRotation(135);
     this->playerCannon.setRotation(135);
   }
   void moveDownRight() {
+    this->playerDirection = "dr";
+
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(speed, speed);
     this->player.setRotation(315);
     this->playerCannon.setRotation(315);
   }
   void moveDownLeft() {
+    this->playerDirection = "dl";
+
     auto speed = this->velocity * sqrt(2) / 2;
     this->player.move(-speed, speed);
     this->player.setRotation(45);
     this->playerCannon.setRotation(45);
   }
   void moveUp() {
+    this->playerDirection = "u";
+
     this->player.move(0, -this->velocity);
     this->player.setRotation(180);
     this->playerCannon.setRotation(180);
   }
   void moveDown() {
+    this->playerDirection = "d";
+
     this->player.move(0, this->velocity);
     this->player.setRotation(0);
     this->playerCannon.setRotation(0);
   }
   void moveRight() {
+    this->playerDirection = "r";
+
     this->player.move(this->velocity, 0);
     this->player.setRotation(270);
     this->playerCannon.setRotation(270);
   }
   void moveLeft() {
+    this->playerDirection = "l";
+
     this->player.move(-this->velocity, 0);
     this->player.setRotation(90);
     this->playerCannon.setRotation(90);
+  }
+
+  void unfire() { this->currFrameCannonIndex = 0; }
+
+  void fire() {
+    this->frameCannonInterval =
+        this->clockFrameCannon.getElapsedTime().asMilliseconds();
+
+    if (this->frameCannonInterval >= this->frameCannonDelay) {
+      if (this->currFrameCannonIndex <
+          this->asset->getVectorCannon4()->size() - 1)
+        this->currFrameCannonIndex++;
+      else {
+        this->currFrameCannonIndex = 0;
+
+        auto playerPos = this->player.getPosition();
+        Fire newFire{this->asset, this->playerDirection};
+        newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
+        newFire.setVelocity(this->velocity * 2);
+
+        this->vectorFire.push_back(newFire);
+      }
+
+      this->clockFrameCannon.restart();
+    }
   }
 
   PlayerBoat(Asset *asset, TilemapWar *tilemap) {
@@ -115,6 +165,8 @@ class PlayerBoat {
 
     // todo: draw cannon
     auto playerPos = this->player.getPosition();
+    this->playerCannon.setTexture(
+        this->asset->getVectorCannon4()->at(this->currFrameCannonIndex));
     this->playerCannon.setPosition(playerPos.x, playerPos.y);
 
     this->playerCannon.setOrigin(boatCannonSize / 2, boatCannonSize / 2);
@@ -163,6 +215,17 @@ class PlayerBoat {
     window.draw(this->colliderDown);
     window.draw(this->colliderRight);
     window.draw(this->colliderLeft);
+
+    // todo: draw fire
+    for (int a = 0; a < this->vectorFire.size(); a++) {
+      Fire *fire = &this->vectorFire.at(a);
+      fire->draw(window);
+
+      if (this->tilemap->isFireCollided(fire->getFireCollider()))
+        this->vectorFire.erase(this->vectorFire.begin() + a);
+    }
+
+    cout << "fire count: " << this->vectorFire.size() << endl;
   }
 };
 

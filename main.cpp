@@ -10,7 +10,8 @@ using namespace sf;
 using namespace std;
 
 int main() {
-  RenderWindow window(VideoMode(1280, 720), "SFML | Starter V2");
+  RenderWindow window(VideoMode(1920, 1080), "SFML | Starter V2",
+                      Style::Fullscreen);
   window.setFramerateLimit(60);
 
   Asset asset{};

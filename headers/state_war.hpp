@@ -22,7 +22,12 @@ class StateWar {
 
   TilemapWar tilemapWar{&asset};
   PlayerBoat playerBoat{&asset, &tilemapWar};
-  EnemyBoat enemyBoat{&asset, &playerBoat};
+  // EnemyBoat enemyBoat{&asset, &tilemapWar, &playerBoat};
+
+  vector<EnemyBoat> vectorEnemyBoat{};
+  Clock clockEnemyBoat;
+  float spawnEnemyBoatInterval = 0;
+  float spawnEnemyBoatDelay = 100;
 
   float colliderMapSize = 32;
   Vector2i playerRealPos;
@@ -80,30 +85,34 @@ class StateWar {
         this->playerBoat.moveLeft();
     }
 
-    else if (Keyboard::isKeyPressed(Keyboard::Up)) {
+    else if (keyUp) {
       if (canMoveUp) {
         if (this->playerRealPos.y <= mapMin)
           this->view.move(0, -this->playerBoat.getVelocity());
         this->playerBoat.moveUp();
       }
-    } else if (Keyboard::isKeyPressed(Keyboard::Down)) {
+    } else if (keyDown) {
       if (canMoveDown) {
         if (this->playerRealPos.y >= mapMaxY)
           this->view.move(0, this->playerBoat.getVelocity());
         this->playerBoat.moveDown();
       }
-    } else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+    } else if (keyRight) {
       if (canMoveRight) {
         if (this->playerRealPos.x >= mapMaxX)
           this->view.move(this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveRight();
       }
-    } else if (Keyboard::isKeyPressed(Keyboard::Left)) {
+    } else if (keyLeft) {
       if (canMoveLeft) {
         if (this->playerRealPos.x <= mapMin)
           this->view.move(-this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveLeft();
       }
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::Space)) {
+      this->playerBoat.fire();
     }
   }
 
@@ -125,10 +134,27 @@ class StateWar {
     if (event.type == Event::Resized) {
       this->view.setSize(event.size.width, event.size.height);
       this->window->setView(this->view);
+    } else if (event.type == Event::KeyReleased) {
+      auto code = event.key.code;
+      if (code == Keyboard::Space) {
+        this->playerBoat.unfire();
+      }
     }
   }
 
   void run(RenderWindow &window) {
+    // todo: spawn enemy boat
+    this->spawnEnemyBoatInterval =
+        this->clockEnemyBoat.getElapsedTime().asMilliseconds();
+    if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
+      EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
+                             &this->playerBoat};
+      newEnemyBoat.setInitPos(0, 0);
+      this->vectorEnemyBoat.push_back(newEnemyBoat);
+
+      this->clockEnemyBoat.restart();
+    }
+
     this->playerRealPos = window.mapCoordsToPixel(
         this->playerBoat.getColliderBox()->getPosition());
     this->window->setView(this->view);
@@ -139,7 +165,11 @@ class StateWar {
     this->playerBoat.draw(window);
 
     // todo: draw enemy
-    this->enemyBoat.draw(window);
+    // this->enemyBoat.draw(window);
+    for (int a = 0; a < this->vectorEnemyBoat.size(); a++) {
+      EnemyBoat *enemyBoat = &this->vectorEnemyBoat.at(a);
+      enemyBoat->draw(window);
+    }
   }
 };
 

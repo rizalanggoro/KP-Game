@@ -19,7 +19,7 @@ class TilemapWar {
 
   float tileSize = 16;
   // float tileTargetSize = 48;
-  float tileTargetSize = 16;
+  float tileTargetSize = 32;
   float tileScaleFactor = 0;
 
   vector<int> vectorTilelayerGrass{}, vectorTilelayerCollision{};
@@ -152,6 +152,14 @@ class TilemapWar {
         count++;
     }
     return count == 0;
+  }
+
+  bool isFireCollided(CircleShape *circle) {
+    for (auto collider : this->vectorCollision) {
+      if (circle->getGlobalBounds().intersects(collider.getGlobalBounds()))
+        return true;
+    }
+    return false;
   }
 };
 
