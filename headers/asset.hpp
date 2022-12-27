@@ -29,6 +29,8 @@ class Asset {
 
   vector<Texture> vectorSquareButtons{};
 
+  vector<Texture> vectorGrassBiom{};
+
   Texture textureFire{};
 
   void loadFont() {
@@ -46,6 +48,18 @@ class Asset {
     this->loadCannon();
     this->loadTextureFire();
     this->loadTextureSquareButtons();
+    this->loadGrassBiom();
+  }
+
+  void loadGrassBiom() {
+    for (int r = 0; r < 5; r++) {
+      for (int c = 0; c < 9; c++) {
+        string path = "assets/images/Basic Grass Biom things 1.png";
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(c * 16, r * 16, 16, 16));
+        this->vectorGrassBiom.push_back(texture);
+      }
+    }
   }
 
   void loadTextureSquareButtons() {
@@ -193,6 +207,8 @@ class Asset {
   vector<Texture> *getVectorCannon2() { return &this->vectorCannon2; }
   vector<Texture> *getVectorCannon3() { return &this->vectorCannon3; }
   vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
+
+  vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
 
   Texture *getTextureFire() { return &this->textureFire; }
 

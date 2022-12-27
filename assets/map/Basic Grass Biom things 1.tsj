@@ -1,0 +1,14 @@
+{ "columns":9,
+ "image":"..\/..\/..\/..\/..\/..\/home\/Downloads\/Compressed\/Sprout Lands - Sprites - Basic pack\/Sprout Lands - Sprites - Basic pack\/Objects\/Basic Grass Biom things 1.png",
+ "imageheight":80,
+ "imagewidth":144,
+ "margin":0,
+ "name":"Basic Grass Biom things 1",
+ "spacing":0,
+ "tilecount":45,
+ "tiledversion":"1.9.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.9"
+}

@@ -21,6 +21,8 @@ class Tilemap {
   vector<int> vectorTilelayerDirt{};
   vector<int> vectorTilelayerBridge{};
   vector<int> vectorTilelayerCollision{};
+  vector<int> vectorTilelayerTrunk{};
+  vector<int> vectorTilelayerLeaf{};
 
   vector<RectangleShape> vectorCollision{};
 
@@ -59,6 +61,8 @@ class Tilemap {
         if (layerName == "bridge") this->vectorTilelayerBridge = layerData;
         if (layerName == "collision")
           this->vectorTilelayerCollision = layerData;
+        if (layerName == "trunk") this->vectorTilelayerTrunk = layerData;
+        if (layerName == "leaf") this->vectorTilelayerLeaf = layerData;
       }
     }
   }
@@ -156,6 +160,23 @@ class Tilemap {
           }
         }
 
+        // todo: draw trunk
+        {
+          int firstGid = 161;
+          int tileType = this->vectorTilelayerTrunk.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorGrassBiom()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
         index++;
       }
     }
@@ -163,6 +184,32 @@ class Tilemap {
     // todo: draw collider
     for (int a = 0; a < this->vectorCollision.size(); a++) {
       window.draw(this->vectorCollision.at(a));
+    }
+  }
+
+  void drawLeaf(RenderWindow &window) {
+    // todo: draw trunk
+    int index = 0;
+    for (int h = 0; h < this->height; h++) {
+      for (int w = 0; w < this->width; w++) {
+        {
+          int firstGid = 161;
+          int tileType = this->vectorTilelayerLeaf.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorGrassBiom()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
+        index++;
+      }
     }
   }
 

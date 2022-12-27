@@ -12,7 +12,7 @@ using namespace sf;
 class Player {
  private:
   Asset *asset;
-  float velocity = 2;
+  float velocity = 5;
 
   Sprite spritePlayer{};
   Clock clockPlayer;
@@ -26,6 +26,7 @@ class Player {
   float playerTargetSize = 48 * 3;
   float playerScaleFactor = 1;
 
+  RectangleShape rectColliderBox{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
 
   void handleKeyboard() {
@@ -46,26 +47,40 @@ class Player {
 
  public:
   // todo: getters
-  Sprite *getSpritePlayer() { return &this->spritePlayer; };
-  float getVelocity() { return this->velocity; };
-  RectangleShape *getColliderUp() { return &this->colliderUp; };
-  RectangleShape *getColliderDown() { return &this->colliderDown; };
-  RectangleShape *getColliderRight() { return &this->colliderRight; };
-  RectangleShape *getColliderLeft() { return &this->colliderLeft; };
+  Sprite *getSpritePlayer() { return &this->spritePlayer; }
+  float getVelocity() { return this->velocity; }
+  float getPlayerTargetSize() { return this->playerTargetSize; }
+  RectangleShape *getRectColliderBox() { return &this->rectColliderBox; }
+  RectangleShape *getColliderUp() { return &this->colliderUp; }
+  RectangleShape *getColliderDown() { return &this->colliderDown; }
+  RectangleShape *getColliderRight() { return &this->colliderRight; }
+  RectangleShape *getColliderLeft() { return &this->colliderLeft; }
 
   Player(Asset *asset) {
     this->asset = asset;
     this->playerScaleFactor = this->playerTargetSize / this->playerSize;
   }
 
-  void moveUp() {}
-  void moveDown() {}
-  void moveRight() {}
-  void moveLeft() {}
-  void moveUpRight() {}
-  void moveUpLeft() {}
-  void moveDownRight() {}
-  void moveDownLeft() {}
+  void moveUp() { this->spritePlayer.move(0, -this->velocity); }
+  void moveDown() { this->spritePlayer.move(0, this->velocity); }
+  void moveRight() { this->spritePlayer.move(this->velocity, 0); }
+  void moveLeft() { this->spritePlayer.move(-this->velocity, 0); }
+  void moveUpRight() {
+    float speed = this->velocity * sqrt(2) / 2;
+    this->spritePlayer.move(speed, -speed);
+  }
+  void moveUpLeft() {
+    float speed = this->velocity * sqrt(2) / 2;
+    this->spritePlayer.move(-speed, -speed);
+  }
+  void moveDownRight() {
+    float speed = this->velocity * sqrt(2) / 2;
+    this->spritePlayer.move(speed, speed);
+  }
+  void moveDownLeft() {
+    float speed = this->velocity * sqrt(2) / 2;
+    this->spritePlayer.move(-speed, speed);
+  }
   void setPosition(float x, float y) { this->spritePlayer.setPosition(x, y); }
 
   void draw(RenderWindow &window) {
@@ -93,7 +108,6 @@ class Player {
     auto playerPos = spritePlayer.getPosition();
     auto playerGlobalBounds = spritePlayer.getGlobalBounds();
 
-    RectangleShape rectColliderBox{};
     rectColliderBox.setOutlineColor(Color(255, 0, 0, 50));
     rectColliderBox.setOutlineThickness(-this->velocity);
     // rectColliderBox.setFillColor(Color::Red);
@@ -101,7 +115,7 @@ class Player {
     rectColliderBox.setSize(Vector2f(this->playerSize, this->playerSize));
     rectColliderBox.setPosition(
         playerPos.x + this->playerSize,
-        playerPos.y + this->playerSize + this->playerSize / 3);
+        playerPos.y + this->playerSize + this->playerSize / 2);
     window.draw(rectColliderBox);
 
     // todo: draw collider
@@ -110,10 +124,10 @@ class Player {
 
     int colliderSize = this->playerSize / 3;
 
-    colliderUp.setSize(Vector2f(colliderSize, this->velocity * 2));
-    colliderDown.setSize(Vector2f(colliderSize, this->velocity * 2));
-    colliderRight.setSize(Vector2f(this->velocity * 2, colliderSize));
-    colliderLeft.setSize(Vector2f(this->velocity * 2, colliderSize));
+    colliderUp.setSize(Vector2f(colliderSize, this->velocity * 1));
+    colliderDown.setSize(Vector2f(colliderSize, this->velocity * 1));
+    colliderRight.setSize(Vector2f(this->velocity * 1, colliderSize));
+    colliderLeft.setSize(Vector2f(this->velocity * 1, colliderSize));
 
     auto color = Color(0, 255, 0, 255);
     colliderUp.setFillColor(color);
@@ -123,7 +137,7 @@ class Player {
 
     colliderUp.setPosition(
         colliderBoxPos.x + (this->playerSize - colliderSize) / 2,
-        colliderBoxPos.y - this->velocity * 2);
+        colliderBoxPos.y - this->velocity * 1);
     colliderDown.setPosition(
         colliderBoxPos.x + (this->playerSize - colliderSize) / 2,
         colliderBoxPos.y + this->playerSize);
@@ -131,7 +145,7 @@ class Player {
         colliderBoxPos.x + this->playerSize,
         colliderBoxPos.y + +(this->playerSize - colliderSize) / 4);
     colliderLeft.setPosition(
-        colliderBoxPos.x - this->velocity * 2,
+        colliderBoxPos.x - this->velocity * 1,
         colliderBoxPos.y + (this->playerSize - colliderSize) / 4);
 
     // todo: -> collider up
