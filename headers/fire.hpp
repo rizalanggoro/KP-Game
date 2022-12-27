@@ -20,6 +20,10 @@ class Fire {
 
   float velocity = 0;
 
+  float targetFireSize = 32;
+  float fireSize = 0;
+  float fireScaleFactor = 1;
+
  public:
   Fire(Asset *asset, string fireDirection) {
     this->asset = asset;
@@ -46,6 +50,10 @@ class Fire {
       angle = 45;
 
     this->fire.setRotation(angle);
+
+    this->fire.setTexture(*this->asset->getTextureFire());
+    this->fireSize = this->fire.getGlobalBounds().width;
+    this->fireScaleFactor = this->targetFireSize / this->fireSize;
   }
 
   Sprite *getSprite() { return &this->fire; }
@@ -54,13 +62,14 @@ class Fire {
   void setVelocity(float velocity) { this->velocity = velocity; }
   void draw(RenderWindow &window) {
     // todo: draw fire
-    this->fire.setTexture(*this->asset->getTextureFire());
+
     this->fire.setOrigin(128 / 2, 128 / 2);
+    this->fire.setScale(this->fireScaleFactor, this->fireScaleFactor);
     window.draw(this->fire);
 
     // todo: draw fire collider
-    this->fireCollider.setFillColor(Color::Red);
-    this->fireCollider.setRadius(4);
+    this->fireCollider.setFillColor(Color::Transparent);
+    this->fireCollider.setRadius(1);
     this->fireCollider.setPosition(this->fire.getPosition());
     window.draw(this->fireCollider);
 

@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "asset.hpp"
-#include "enemy.hpp"
 #include "json.hpp"
 #include "player.hpp"
 
@@ -20,10 +19,14 @@ class Tilemap {
 
   vector<int> vectorTilelayerGrass{};
   vector<int> vectorTilelayerDirt{};
-  vector<int> vectorTilelayerBrigde{};
+  vector<int> vectorTilelayerBridge{};
   vector<int> vectorTilelayerCollision{};
 
   vector<RectangleShape> vectorCollision{};
+
+  float tileSize = 16;
+  float tileTargetSize = 48;
+  float tileScaleFactor = 1;
 
   int height;
   int width;
@@ -53,7 +56,7 @@ class Tilemap {
         auto layerData = layer["data"].get<vector<int>>();
         if (layerName == "grass") this->vectorTilelayerGrass = layerData;
         if (layerName == "dirt") this->vectorTilelayerDirt = layerData;
-        if (layerName == "bridge") this->vectorTilelayerBrigde = layerData;
+        if (layerName == "bridge") this->vectorTilelayerBridge = layerData;
         if (layerName == "collision")
           this->vectorTilelayerCollision = layerData;
       }
@@ -67,9 +70,9 @@ class Tilemap {
         int tileType = this->vectorTilelayerCollision.at(index);
         if (tileType != 0) {
           RectangleShape rect{};
-          rect.setSize(Vector2f(16, 16));
+          rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
           rect.setFillColor(Color(255, 0, 0, 50));
-          rect.setPosition(16 * w, 16 * h);
+          rect.setPosition(this->tileTargetSize * w, this->tileTargetSize * h);
           this->vectorCollision.push_back(rect);
         }
 
@@ -79,10 +82,16 @@ class Tilemap {
   }
 
  public:
+  int getHeight() { return height; }
+  int getWidth() { return width; }
+  float getTileTargetSize() { return this->tileTargetSize; }
+
   Tilemap(Asset *asset) {
     this->asset = asset;
 
-    loadMapJson();
+    this->tileScaleFactor = this->tileTargetSize / this->tileSize;
+
+    this->loadMapJson();
     this->loadTilelayerCollision();
   }
 
@@ -104,8 +113,10 @@ class Tilemap {
         // todo: draw water
         {
           Sprite sprite{};
+          sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
           sprite.setTexture(this->asset->getVectorWater()->at(currWaterIndex));
-          sprite.setPosition(16 * w, 16 * h);
+          sprite.setPosition(this->tileTargetSize * w,
+                             this->tileTargetSize * h);
 
           window.draw(sprite);
         }
@@ -117,25 +128,29 @@ class Tilemap {
           if (tileType != 0) {
             int tileIndex = tileType - firstGid;
 
-            Sprite srpite{};
-            srpite.setTexture(this->asset->getVectorGrass()->at(tileIndex));
-            srpite.setPosition(16 * w, 16 * h);
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorGrass()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
 
-            window.draw(srpite);
+            window.draw(sprite);
           }
         }
 
         // todo: draw bridge
         {
           int firstGid = 78;
-          int tileType = this->vectorTilelayerBrigde.at(index);
+          int tileType = this->vectorTilelayerBridge.at(index);
           if (tileType != 0) {
             int tileIndex = tileType - firstGid;
 
             Sprite sprite{};
             sprite.setTexture(
                 this->asset->getVectorWoodBridge()->at(tileIndex));
-            sprite.setPosition(16 * w, 16 * h);
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
 
             window.draw(sprite);
           }
@@ -151,15 +166,12 @@ class Tilemap {
     }
   }
 
-  int getHeight() { return height; }
-  int getWidth() { return width; }
-
-  bool canMove(Player &player, int dir) {
+  bool canMove(Player &player, string dir) {
     RectangleShape *playerCollider = NULL;
-    if (dir == 0) playerCollider = player.getColliderDown();
-    if (dir == 1) playerCollider = player.getColliderUp();
-    if (dir == 2) playerCollider = player.getColliderLeft();
-    if (dir == 3) playerCollider = player.getColliderRight();
+    if (dir == "d") playerCollider = player.getColliderDown();
+    if (dir == "u") playerCollider = player.getColliderUp();
+    if (dir == "l") playerCollider = player.getColliderLeft();
+    if (dir == "r") playerCollider = player.getColliderRight();
 
     int count = 0;
     for (int a = 0; a < this->vectorCollision.size(); a++) {

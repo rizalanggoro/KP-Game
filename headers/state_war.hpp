@@ -116,6 +116,34 @@ class StateWar {
     }
   }
 
+  void drawGuiProfile(RenderWindow &window) {
+    // todo: gui selected boat
+    {
+      for (int a = 0; a < 4; a++) {
+        auto buttonSize = 136;
+        auto buttonScale = buttonSize / 48;
+        auto isSelected = this->playerBoat.getCurrentBoatIndex() == a;
+
+        Sprite spriteButton{};
+        spriteButton.setTexture(
+            this->asset.getVectorSquareButtons()->at(isSelected ? 0 : 4));
+        spriteButton.setPosition(buttonSize / 2 * a, 0);
+        spriteButton.setScale(buttonScale, buttonScale);
+
+        window.draw(spriteButton);
+
+        float boatSize = 56;
+        float boatScale = boatSize / 128;
+        Sprite spriteBoat{};
+        spriteBoat.setTexture(this->asset.getVectorBoatColor1()->at(a));
+        spriteBoat.setScale(boatScale, boatScale);
+        spriteBoat.setPosition(a * buttonSize / 2 + 20, 20);
+
+        window.draw(spriteBoat);
+      }
+    }
+  }
+
  public:
   StateWar(string *state, RenderWindow *window) {
     this->state = state;
@@ -138,6 +166,13 @@ class StateWar {
       auto code = event.key.code;
       if (code == Keyboard::Space) {
         this->playerBoat.unfire();
+      }
+    } else if (event.type == Event::KeyPressed) {
+      auto code = event.key.code;
+      if (code == Keyboard::Q) {
+        this->playerBoat.previousBoat();
+      } else if (code == Keyboard::E) {
+        this->playerBoat.nextBoat();
       }
     }
   }
@@ -167,11 +202,34 @@ class StateWar {
     this->playerBoat.draw(window);
 
     // todo: draw enemy
-    // this->enemyBoat.draw(window);
     for (int a = 0; a < this->vectorEnemyBoat.size(); a++) {
       EnemyBoat *enemyBoat = &this->vectorEnemyBoat.at(a);
       enemyBoat->draw(window);
+
+      // todo: check collision
+      for (int b = 0; b < this->playerBoat.getVectorFire()->size(); b++) {
+        Fire *fire = &this->playerBoat.getVectorFire()->at(b);
+        if (enemyBoat->getColliderFire()->getGlobalBounds().intersects(
+                fire->getSprite()->getGlobalBounds())) {
+          this->playerBoat.getVectorFire()->erase(
+              this->playerBoat.getVectorFire()->begin() + b);
+          enemyBoat->decreaseHp(10);
+        }
+      }
+
+      // todo: check hp
+      if (enemyBoat->getHp() <= 0) {
+        this->vectorEnemyBoat.erase(this->vectorEnemyBoat.begin() + a);
+      }
     }
+
+    // todo: reset view
+    this->window->setView(this->window->getDefaultView());
+
+    this->drawGuiProfile(window);
+
+    // todo: set view
+    this->window->setView(this->view);
   }
 };
 

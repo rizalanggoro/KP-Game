@@ -12,12 +12,12 @@ using namespace sf;
 
 class StateTest {
  private:
-  string *state;
-  View view{};
+  // string *state;
+  // View view{};
 
-  Asset *asset;
-  Player player{asset};
-  RectangleShape test{};
+  // Asset *asset;
+  // Player player{asset};
+  // RectangleShape test{};
 
   void handleKeyboard() {
     // if (Keyboard::isKeyPressed(Keyboard::Up)) this->view->move(0, -5);
@@ -27,34 +27,36 @@ class StateTest {
   }
 
  public:
-  StateTest(string *state, RenderWindow *window, Asset *asset) {
-    this->state = state;
-    this->asset = asset;
-    // this->view = view;
+  StateTest(string *state, RenderWindow *window) {
+    // this->state = state;
+    // this->asset = asset;
+    // // this->view = view;
 
-    view = window->getDefaultView();
-    view.setCenter(0, 0);
-    view.zoom(.1);
+    // view = window->getDefaultView();
+    // view.setCenter(0, 0);
+    // view.zoom(.1);
 
     // this->view->setCenter(1280 / 2, 720 / 2);
     // // this->view->zoom(.1);
     // window->setView(*this->view);
   }
 
-  void handleEvent(Event &event) { this->player.handleEvent(event); }
+  void handleEvent(Event &event) {
+    // this->player.handleEvent(event);
+  }
 
   void run(RenderWindow &window) {
-    window.setView(view);
-    // this->handleKeyboard();
+    // window.setView(view);
+    // // this->handleKeyboard();
 
-    RectangleShape rect{};
-    rect.setFillColor(Color::Transparent);
-    rect.setOutlineThickness(-1);
-    rect.setOutlineColor(Color::Red);
-    rect.setSize(Vector2f(1280, 720));
-    window.draw(rect);
+    // RectangleShape rect{};
+    // rect.setFillColor(Color::Transparent);
+    // rect.setOutlineThickness(-1);
+    // rect.setOutlineColor(Color::Red);
+    // rect.setSize(Vector2f(1280, 720));
+    // window.draw(rect);
 
-    this->player.draw(window);
+    // this->player.draw(window);
 
     // test.setFillColor(Color::Black);
     // test.setSize(Vector2f(100, 100));

@@ -10,15 +10,14 @@ using namespace sf;
 using namespace std;
 
 int main() {
-  RenderWindow window(VideoMode(1920, 1080), "SFML | Starter V2",
-                      Style::Fullscreen);
+  RenderWindow window(VideoMode(1280, 720), "SFML | Starter V2",
+                      Style::Default);
   window.setFramerateLimit(60);
 
-  Asset asset{};
-  string state = "war";
+  string state = "world";
 
   // todo: states
-  StateTest stateTest{&state, &window, &asset};
+  // StateTest stateTest{&state, &window};
   StateWorld stateWorld{&state, &window};
   StateWar stateWar{&state, &window};
 
@@ -29,14 +28,14 @@ int main() {
       if (event.type == Event::KeyPressed)
         if (event.key.code == Keyboard::Escape) window.close();
 
-      if (state == "test") stateTest.handleEvent(event);
+      // if (state == "test") stateTest.handleEvent(event);
       if (state == "world") stateWorld.handleEvent(event);
       if (state == "war") stateWar.handleEvent(event);
     }
 
     window.clear(Color::White);
 
-    if (state == "test") stateTest.run(window);
+    // if (state == "test") stateTest.run(window);
     if (state == "world") stateWorld.run(window);
     if (state == "war") stateWar.run(window);
 

@@ -69,7 +69,6 @@ class Player {
     spritePlayer.setTexture(this->asset->getVectorCharSpite()
                                 ->at(this->frameDirIndex)
                                 .at(this->isPlayerIdle ? 0 : this->frameIndex));
-    spritePlayer.setColor(Color::Green);
 
     window.draw(spritePlayer);
 

@@ -7,7 +7,7 @@
 
 #include "asset.hpp"
 #include "player.hpp"
-#include "tilemap.hpp"
+#include "tilemap_world.hpp"
 
 using namespace std;
 using namespace sf;
@@ -21,17 +21,20 @@ class StateWorld {
   Asset asset{};
   Player player{&asset};
   Tilemap tilemap{&asset};
-  // Enemy enemy{&player, Vector2f(27 * 16, 15 * 16)};
 
   Vector2i playerRealPos;
 
   void handleKeyboard() {
+    bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
+    bool keyDown = Keyboard::isKeyPressed(Keyboard::Down);
+    bool keyRight = Keyboard::isKeyPressed(Keyboard::Right);
+    bool keyLeft = Keyboard::isKeyPressed(Keyboard::Left);
+
     // todo: handle two direction move
-    if (Keyboard::isKeyPressed(Keyboard::Down) &&
-        Keyboard::isKeyPressed(Keyboard::Left)) {
+    if (keyDown && keyLeft) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
-      auto canMoveDown = this->tilemap.canMove(this->player, 0);
-      auto canMoveLeft = this->tilemap.canMove(this->player, 2);
+      auto canMoveDown = this->tilemap.canMove(this->player, "d");
+      auto canMoveLeft = this->tilemap.canMove(this->player, "l");
 
       if (canMoveDown && canMoveLeft)
         this->view.move(-speed, speed);
@@ -40,11 +43,10 @@ class StateWorld {
       else if (canMoveLeft)
         this->view.move(-speed, 0);
 
-    } else if (Keyboard::isKeyPressed(Keyboard::Down) &&
-               Keyboard::isKeyPressed(Keyboard::Right)) {
+    } else if (keyDown && keyRight) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
-      auto canMoveDown = this->tilemap.canMove(this->player, 0);
-      auto canMoveRight = this->tilemap.canMove(this->player, 3);
+      auto canMoveDown = this->tilemap.canMove(this->player, "d");
+      auto canMoveRight = this->tilemap.canMove(this->player, "r");
 
       if (canMoveDown && canMoveRight)
         this->view.move(speed, speed);
@@ -53,11 +55,10 @@ class StateWorld {
       else if (canMoveRight)
         this->view.move(speed, 0);
 
-    } else if (Keyboard::isKeyPressed(Keyboard::Up) &&
-               Keyboard::isKeyPressed(Keyboard::Left)) {
+    } else if (keyUp && keyLeft) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
-      auto canMoveUp = this->tilemap.canMove(this->player, 1);
-      auto canMoveLeft = this->tilemap.canMove(this->player, 2);
+      auto canMoveUp = this->tilemap.canMove(this->player, "u");
+      auto canMoveLeft = this->tilemap.canMove(this->player, "l");
 
       if (canMoveUp && canMoveLeft)
         this->view.move(-speed, -speed);
@@ -66,11 +67,10 @@ class StateWorld {
       else if (canMoveLeft)
         this->view.move(-speed, 0);
 
-    } else if (Keyboard::isKeyPressed(Keyboard::Up) &&
-               Keyboard::isKeyPressed(Keyboard::Right)) {
+    } else if (keyUp && keyRight) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
-      auto canMoveUp = this->tilemap.canMove(this->player, 1);
-      auto canMoveRight = this->tilemap.canMove(this->player, 3);
+      auto canMoveUp = this->tilemap.canMove(this->player, "u");
+      auto canMoveRight = this->tilemap.canMove(this->player, "r");
 
       if (canMoveUp && canMoveRight)
         this->view.move(speed, -speed);
@@ -82,17 +82,17 @@ class StateWorld {
     }
 
     // todo: handle one direction move
-    else if (Keyboard::isKeyPressed(Keyboard::Down)) {
-      if (this->tilemap.canMove(player, 0))
+    else if (keyDown) {
+      if (this->tilemap.canMove(player, "d"))
         this->view.move(0, this->player.getVelocity());
-    } else if (Keyboard::isKeyPressed(Keyboard::Up)) {
-      if (this->tilemap.canMove(player, 1))
+    } else if (keyUp) {
+      if (this->tilemap.canMove(player, "u"))
         this->view.move(0, -this->player.getVelocity());
-    } else if (Keyboard::isKeyPressed(Keyboard::Left)) {
-      if (this->tilemap.canMove(player, 2))
+    } else if (keyLeft) {
+      if (this->tilemap.canMove(player, "l"))
         this->view.move(-this->player.getVelocity(), 0);
-    } else if (Keyboard::isKeyPressed(Keyboard::Right)) {
-      if (this->tilemap.canMove(player, 3))
+    } else if (keyRight) {
+      if (this->tilemap.canMove(player, "r"))
         this->view.move(this->player.getVelocity(), 0);
     }
   }
@@ -109,24 +109,16 @@ class StateWorld {
     // this->player.getSpritePlayer()->setPosition((30 * 16) / 2, (20 * 16) /
     // 2);
 
-    view.move((5 * 16), (15 * 16));
+    auto tileTargetSize = this->tilemap.getTileTargetSize();
+    auto width = this->tilemap.getWidth();
+    auto height = this->tilemap.getHeight();
+
+    view.move(width / 2 * tileTargetSize, height / 2 * tileTargetSize);
 
     // this->player.getSpritePlayer()->setPosition(0, 0);
   }
 
-  void handleEvent(Event &event) {
-    this->player.handleEvent(event);
-    if (event.type == Event::KeyPressed) {
-      auto code = event.key.code;
-      if (code == Keyboard::Equal) {
-        this->view.zoom(.9);
-      }
-
-      if (code == Keyboard::Dash) {
-        this->view.zoom(1.1);
-      }
-    }
-  }
+  void handleEvent(Event &event) { this->player.handleEvent(event); }
 
   void run(RenderWindow &window) {
     window.setView(view);
@@ -154,9 +146,6 @@ class StateWorld {
         winCenter.x - (playerGlobalBounds.width / 2),
         winCenter.y - (playerGlobalBounds.height / 2));
     this->player.draw(window);
-
-    // todo: draw enemy
-    // this->enemy.draw(window);
 
     // todo: draw tree
   }

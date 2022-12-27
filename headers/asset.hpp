@@ -12,6 +12,8 @@ using json = nlohmann::json;
 
 class Asset {
  private:
+  Font font{};
+
   Texture tilledDirt{};
 
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{};
@@ -25,7 +27,14 @@ class Asset {
 
   vector<vector<Texture>> vectorCharSpite{};
 
+  vector<Texture> vectorSquareButtons{};
+
   Texture textureFire{};
+
+  void loadFont() {
+    string path = "assets/fonts/PressStart2P-Regular.ttf";
+    if (this->font.loadFromFile(path)) cout << "font loaded!" << endl;
+  }
 
   void loadTexture() {
     loadTextureGrass();
@@ -36,6 +45,20 @@ class Asset {
     this->loadBoat();
     this->loadCannon();
     this->loadTextureFire();
+    this->loadTextureSquareButtons();
+  }
+
+  void loadTextureSquareButtons() {
+    string path = "assets/images/Square Buttons 26x26.png";
+
+    for (int r = 0; r < 4; r++) {
+      for (int c = 0; c < 2; c++) {
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(c * 48, r * 48, 48, 48));
+
+        this->vectorSquareButtons.push_back(texture);
+      }
+    }
   }
 
   void loadTextureFire() {
@@ -154,7 +177,10 @@ class Asset {
   }
 
  public:
-  Asset() { loadTexture(); }
+  Asset() {
+    this->loadTexture();
+    this->loadFont();
+  }
 
   vector<Texture> *getVectorWater() { return &vectorWater; };
   vector<Texture> *getVectorGrass() { return &vectorGrass; };
@@ -169,6 +195,10 @@ class Asset {
   vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
 
   Texture *getTextureFire() { return &this->textureFire; }
+
+  vector<Texture> *getVectorSquareButtons() {
+    return &this->vectorSquareButtons;
+  }
 };
 
 #endif

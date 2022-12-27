@@ -41,6 +41,8 @@ class PlayerBoat {
   float frameCannonInterval = 0;
   int currFrameCannonIndex = 0;
 
+  int currentBoatIndex = 0;
+
   int parseDirection(string dir) {
     int angle = 0;
     if (dir == "ur") angle = 225;
@@ -64,6 +66,21 @@ class PlayerBoat {
   RectangleShape *getColliderDown() { return &this->colliderDown; }
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
+  int getCurrentBoatIndex() { return this->currentBoatIndex; }
+  vector<Fire> *getVectorFire() { return &this->vectorFire; }
+
+  void nextBoat() {
+    if (this->currentBoatIndex < this->asset->getVectorBoatColor1()->size() - 1)
+      this->currentBoatIndex++;
+    else
+      this->currentBoatIndex = 0;
+  }
+  void previousBoat() {
+    if (this->currentBoatIndex > 0)
+      this->currentBoatIndex--;
+    else
+      this->currentBoatIndex = this->asset->getVectorBoatColor1()->size() - 1;
+  }
 
   void moveUpRight() {
     this->playerDirection = "ur";
@@ -148,7 +165,8 @@ class PlayerBoat {
 
   void draw(RenderWindow &window) {
     // todo: draw boat
-    this->player.setTexture(this->asset->getVectorBoatColor1()->at(0));
+    this->player.setTexture(
+        this->asset->getVectorBoatColor1()->at(this->currentBoatIndex));
     this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->player.setRotation(this->parseDirection(this->playerDirection));
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
