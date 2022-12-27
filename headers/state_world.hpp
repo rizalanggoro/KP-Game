@@ -104,21 +104,25 @@ class StateWorld {
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
-    // view.zoom(.3);
-
-    // this->player.getSpritePlayer()->setPosition((30 * 16) / 2, (20 * 16) /
-    // 2);
 
     auto tileTargetSize = this->tilemap.getTileTargetSize();
     auto width = this->tilemap.getWidth();
     auto height = this->tilemap.getHeight();
 
-    view.move(width / 2 * tileTargetSize, height / 2 * tileTargetSize);
-
-    // this->player.getSpritePlayer()->setPosition(0, 0);
+    this->player.setPosition(6 * this->tilemap.getTileTargetSize(),
+                             16 * this->tilemap.getTileTargetSize());
+    this->view.move(
+        this->tilemap.getWidth() / 2 * this->tilemap.getTileTargetSize(),
+        this->tilemap.getHeight() / 1.5 * this->tilemap.getTileTargetSize());
   }
 
-  void handleEvent(Event &event) { this->player.handleEvent(event); }
+  void handleEvent(Event &event) {
+    this->player.handleEvent(event);
+    if (event.type == Event::Resized) {
+      auto size = event.size;
+      this->view.setSize(size.width, size.height);
+    }
+  }
 
   void run(RenderWindow &window) {
     window.setView(view);
@@ -140,11 +144,12 @@ class StateWorld {
     tilemap.draw(window);
 
     // todo: draw sprite player
-    auto winCenter = window.getView().getCenter();
-    auto playerGlobalBounds = this->player.getSpritePlayer()->getGlobalBounds();
-    this->player.getSpritePlayer()->setPosition(
-        winCenter.x - (playerGlobalBounds.width / 2),
-        winCenter.y - (playerGlobalBounds.height / 2));
+    // auto winCenter = window.getView().getCenter();
+    // auto playerGlobalBounds =
+    // this->player.getSpritePlayer()->getGlobalBounds();
+    // this->player.getSpritePlayer()->setPosition(
+    //     winCenter.x - (playerGlobalBounds.width / 2),
+    //     winCenter.y - (playerGlobalBounds.height / 2));
     this->player.draw(window);
 
     // todo: draw tree

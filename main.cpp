@@ -14,7 +14,7 @@ int main() {
                       Style::Default);
   window.setFramerateLimit(60);
 
-  string state = "world";
+  string state = "war";
 
   // todo: states
   // StateTest stateTest{&state, &window};
