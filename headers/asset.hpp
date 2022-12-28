@@ -30,6 +30,7 @@ class Asset {
   vector<Texture> vectorGrassBiom{};
   vector<Texture> vectorChest{};
   vector<Texture> vectorSettingMenu{};
+  vector<Texture> vectorHome{};
 
   Texture textureFire{};
   Texture textureDialogBox{};
@@ -54,6 +55,19 @@ class Asset {
     this->loadTextureChest();
     this->loadTextureSettingMenu();
     this->loadTextureDialogBox();
+    this->loadTextureHome();
+  }
+
+  void loadTextureHome() {
+    for (int h = 0; h < 4; h++) {
+      for (int w = 0; w < 3; w++) {
+        string path = "assets/images/home-set (1).png";
+        Texture texture{};
+        if (texture.loadFromFile(path, IntRect(w * 16, h * 16, 16, 16)))
+          cout << "home loaded!" << endl;
+        this->vectorHome.push_back(texture);
+      }
+    }
   }
 
   void loadTextureDialogBox() {
@@ -259,9 +273,9 @@ class Asset {
   vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
   vector<Texture> *getVectorChest() { return &this->vectorChest; }
   vector<Texture> *getVectorSettingMenu() { return &this->vectorSettingMenu; }
+  vector<Texture> *getVectorHome() { return &this->vectorHome; }
 
   Texture *getTextureFire() { return &this->textureFire; }
-  Texture *getTextureDialogBox() { return &this->textureDialogBox; }
 
   vector<Texture> *getVectorSquareButtons() {
     return &this->vectorSquareButtons;

@@ -6,6 +6,8 @@
 #include "headers/state_war.hpp"
 #include "headers/state_world.hpp"
 
+// #define DEBUG
+
 using namespace sf;
 using namespace std;
 

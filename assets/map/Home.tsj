@@ -1,0 +1,14 @@
+{ "columns":3,
+ "image":"..\/..\/..\/..\/..\/..\/home\/Downloads\/home-set (1).png",
+ "imageheight":64,
+ "imagewidth":48,
+ "margin":0,
+ "name":"Home",
+ "spacing":0,
+ "tilecount":12,
+ "tiledversion":"1.9.2",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":"1.9"
+}

@@ -19,7 +19,8 @@ class Tilemap {
 
   vector<int> vectorTilelayerGrass{}, vectorTilelayerDirt{},
       vectorTilelayerBridge{}, vectorTilelayerCollision{},
-      vectorTilelayerTrunk{}, vectorTilelayerLeaf{};
+      vectorTilelayerTrunk{}, vectorTilelayerLeaf{}, vectorTilelayerWall{},
+      vectorTilelayerRoof{};
 
   vector<RectangleShape> vectorCollision{};
 
@@ -41,6 +42,7 @@ class Tilemap {
   int currChestIndex = 0;
 
   Text textWarPoint{};
+  Text textShopPoint{};
 
   void loadMapJson() {
     ifstream file("assets/map/game.tmj");
@@ -67,6 +69,8 @@ class Tilemap {
           this->vectorTilelayerCollision = layerData;
         if (layerName == "trunk") this->vectorTilelayerTrunk = layerData;
         if (layerName == "leaf") this->vectorTilelayerLeaf = layerData;
+        if (layerName == "wall") this->vectorTilelayerWall = layerData;
+        if (layerName == "roof") this->vectorTilelayerRoof = layerData;
       }
     }
   }
@@ -94,6 +98,7 @@ class Tilemap {
   int getWidth() { return width; }
   float getTileTargetSize() { return this->tileTargetSize; }
   Text *getTextWarPoint() { return &this->textWarPoint; }
+  Text *getTextShopPoint() { return &this->textShopPoint; }
 
   Tilemap(Asset *asset) {
     this->asset = asset;
@@ -191,6 +196,23 @@ class Tilemap {
           }
         }
 
+        // todo: draw wall
+        {
+          int firstGid = 206;
+          int tileType = this->vectorTilelayerWall.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorHome()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
         // todo: draw dirt
         {
           int firstGid = 93;
@@ -238,6 +260,20 @@ class Tilemap {
           window.draw(spriteChest);
         }
 
+        // todo: draw shop / upgrade checkpoint
+        {
+          this->textShopPoint.setString(">> UPGRADE! <<");
+          this->textShopPoint.setFont(*this->asset->getFont());
+          this->textShopPoint.setCharacterSize(16);
+          this->textShopPoint.setFillColor(Color(107, 75, 91, 255));
+
+          auto tBounds = this->textShopPoint.getGlobalBounds();
+          float marginX = ((5 * tileTargetSize) - tBounds.width) / 2;
+          float marginY = ((1 * tileTargetSize) - tBounds.height) / 2;
+          this->textShopPoint.setPosition(12 * this->tileTargetSize + marginX,
+                                          22 * this->tileTargetSize + marginY);
+          window.draw(this->textShopPoint);
+        }
         index++;
       }
     }
@@ -253,6 +289,7 @@ class Tilemap {
     int index = 0;
     for (int h = 0; h < this->height; h++) {
       for (int w = 0; w < this->width; w++) {
+        // todo: draw leaf
         {
           int firstGid = 161;
           int tileType = this->vectorTilelayerLeaf.at(index);
@@ -261,6 +298,23 @@ class Tilemap {
 
             Sprite sprite{};
             sprite.setTexture(this->asset->getVectorGrassBiom()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
+        // todo: draw roof
+        {
+          int firstGid = 206;
+          int tileType = this->vectorTilelayerRoof.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorHome()->at(tileIndex));
             sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
             sprite.setPosition(this->tileTargetSize * w,
                                this->tileTargetSize * h);

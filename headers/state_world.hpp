@@ -27,7 +27,9 @@ class StateWorld {
   float colliderMapSize = 48;
 
   bool isInWarPoint = false;
+  bool isInShopPoint = false;
   bool isPaused = false;
+  bool isShopOpenned = true;
 
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
@@ -137,8 +139,19 @@ class StateWorld {
     window.draw(rect);
 
     if (this->isPaused) this->drawPauseMenu(window);
-    if (this->isInWarPoint && !this->isPaused)
-      this->drawWarPointInstruction(window);
+    if (!this->isPaused) {
+      if (this->isInWarPoint) {
+        this->drawInstruction(window,
+                              "Press enter to go to the battlefield "
+                              "and\nplunder the enemy's treasure!");
+      }
+      if (this->isInShopPoint && !this->isShopOpenned) {
+        this->drawInstruction(
+            window, "Wanna upgrade something?\nEnter for upgrade something.");
+      }
+      if (this->isShopOpenned) {
+      }
+    }
   }
 
   void drawPauseMenu(RenderWindow &window) {
@@ -172,17 +185,13 @@ class StateWorld {
     window.draw(title);
   }
 
-  void drawWarPointInstruction(RenderWindow &window) {
-    string message =
-        "Press enter to go to the battlefield and\nplunder the enemy's "
-        "treasure!";
-
-    auto wSize = window.getSize();
+  void drawInstruction(RenderWindow &window, string instruction) {
+     auto wSize = window.getSize();
 
     Text text{};
     text.setLineSpacing(2);
-    text.setCharacterSize(16);
-    text.setString(message);
+    text.setCharacterSize(24);
+    text.setString(instruction);
     text.setFont(*this->asset.getFont());
     text.setFillColor(Color::White);
     text.setOutlineColor(Color(124, 153, 159, 255));
@@ -267,6 +276,11 @@ class StateWorld {
     this->isInWarPoint =
         this->player.getRectColliderBox()->getGlobalBounds().intersects(
             this->tilemap.getTextWarPoint()->getGlobalBounds());
+
+    // todo; check player in shop point
+    this->isInShopPoint =
+        this->player.getRectColliderBox()->getGlobalBounds().intersects(
+            this->tilemap.getTextShopPoint()->getGlobalBounds());
   }
 };
 
