@@ -15,7 +15,7 @@ using namespace sf;
 class StateWorld {
  private:
   string *state;
-  View view;
+  View view, viewGui;
   RenderWindow *window;
 
   Asset asset{};
@@ -24,9 +24,10 @@ class StateWorld {
 
   Vector2i playerRealPos;
 
-  float colliderMapSize = 32;
+  float colliderMapSize = 48;
 
   bool isInWarPoint = false;
+  bool isPaused = false;
 
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
@@ -134,6 +135,64 @@ class StateWorld {
     rect.setFillColor(Color::Red);
     rect.setSize(Vector2f(100, 100));
     window.draw(rect);
+
+    if (this->isPaused) this->drawPauseMenu(window);
+    if (this->isInWarPoint && !this->isPaused)
+      this->drawWarPointInstruction(window);
+  }
+
+  void drawPauseMenu(RenderWindow &window) {
+    auto wCenter = window.getView().getCenter();
+
+    RectangleShape bgDark{};
+    bgDark.setFillColor(Color(0, 0, 0, 100));
+    bgDark.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    window.draw(bgDark);
+
+    Sprite background{};
+    background.setTexture(this->asset.getVectorSettingMenu()->at(1));
+    background.setScale(720 / 128, window.getSize().y / 144);
+
+    auto bgBounds = background.getGlobalBounds();
+    background.setPosition(wCenter.x - (bgBounds.width / 2),
+                           wCenter.y - (bgBounds.height / 2));
+    window.draw(background);
+
+    auto bgPos = background.getPosition();
+
+    Text title{};
+    title.setFont(*this->asset.getFont());
+    title.setString("Paused!");
+    title.setFillColor(Color::White);
+
+    auto titleBounds = title.getGlobalBounds();
+    title.setPosition(bgPos.x + (bgBounds.width - titleBounds.width) / 2,
+                      bgPos.y + 3 * 8 * window.getSize().y / 144);
+
+    window.draw(title);
+  }
+
+  void drawWarPointInstruction(RenderWindow &window) {
+    string message =
+        "Press enter to go to the battlefield and\nplunder the enemy's "
+        "treasure!";
+
+    auto wSize = window.getSize();
+
+    Text text{};
+    text.setLineSpacing(2);
+    text.setCharacterSize(16);
+    text.setString(message);
+    text.setFont(*this->asset.getFont());
+    text.setFillColor(Color::White);
+    text.setOutlineColor(Color(124, 153, 159, 255));
+    text.setOutlineThickness(3);
+    text.setLetterSpacing(1.32);
+
+    auto textBounds = text.getGlobalBounds();
+    text.setPosition(48, wSize.y - textBounds.height - 48);
+
+    window.draw(text);
   }
 
  public:
@@ -143,6 +202,8 @@ class StateWorld {
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
+    this->viewGui = window->getDefaultView();
+    this->viewGui.setCenter(window->getSize().x / 2, window->getSize().y / 2);
 
     auto tileTargetSize = this->tilemap.getTileTargetSize();
     auto width = this->tilemap.getWidth();
@@ -160,12 +221,16 @@ class StateWorld {
     if (event.type == Event::Resized) {
       auto size = event.size;
       this->view.setSize(size.width, size.height);
+      this->viewGui.setSize(size.width, size.height);
+      this->viewGui.setCenter(size.width / 2, size.height / 2);
     } else if (event.type == Event::KeyPressed) {
       auto code = event.key.code;
       if (code == Keyboard::Enter) {
         if (this->isInWarPoint) {
           *this->state = "war";
         }
+      } else if (code == Keyboard::Escape) {
+        this->isPaused = !this->isPaused;
       }
     }
   }
@@ -195,7 +260,7 @@ class StateWorld {
     // todo: draw leaf
     this->tilemap.drawLeaf(window);
 
-    this->window->setView(this->window->getDefaultView());
+    this->window->setView(this->viewGui);
     this->drawGui(window);
 
     // todo: check player in war point

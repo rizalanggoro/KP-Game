@@ -10,7 +10,7 @@ using namespace sf;
 using namespace std;
 
 int main() {
-  RenderWindow window(VideoMode(1280, 720), "SFML | Starter V2",
+  RenderWindow window(VideoMode(1280, 720), "SFML | Game Fix InsyaAllah",
                       Style::Default);
   window.setFramerateLimit(60);
 
@@ -25,8 +25,8 @@ int main() {
     Event event{};
     while (window.pollEvent(event)) {
       if (event.type == Event::Closed) window.close();
-      if (event.type == Event::KeyPressed)
-        if (event.key.code == Keyboard::Escape) window.close();
+      // if (event.type == Event::KeyPressed)
+      //   if (event.key.code == Keyboard::Escape) window.close();
 
       // if (state == "test") stateTest.handleEvent(event);
       if (state == "world") stateWorld.handleEvent(event);

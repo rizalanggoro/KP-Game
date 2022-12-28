@@ -29,8 +29,10 @@ class Asset {
   vector<Texture> vectorSquareButtons{};
   vector<Texture> vectorGrassBiom{};
   vector<Texture> vectorChest{};
+  vector<Texture> vectorSettingMenu{};
 
   Texture textureFire{};
+  Texture textureDialogBox{};
 
   void loadFont() {
     string path = "assets/fonts/PressStart2P-Regular.ttf";
@@ -50,6 +52,24 @@ class Asset {
     this->loadTextureSquareButtons();
     this->loadGrassBiom();
     this->loadTextureChest();
+    this->loadTextureSettingMenu();
+    this->loadTextureDialogBox();
+  }
+
+  void loadTextureDialogBox() {
+    string path = "assets/images/dialog box.png";
+    if (this->textureDialogBox.loadFromFile(path))
+      cout << "dialog box loaded!" << endl;
+  }
+
+  void loadTextureSettingMenu() {
+    string path = "assets/images/Setting menu.png";
+    for (int a = 0; a < 2; a++) {
+      Texture texture{};
+      if (texture.loadFromFile(path, IntRect(a * 128, 0, 128, 144)))
+        cout << "setting menu loaded!" << endl;
+      this->vectorSettingMenu.push_back(texture);
+    }
   }
 
   void loadTextureChest() {
@@ -238,8 +258,10 @@ class Asset {
 
   vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
   vector<Texture> *getVectorChest() { return &this->vectorChest; }
+  vector<Texture> *getVectorSettingMenu() { return &this->vectorSettingMenu; }
 
   Texture *getTextureFire() { return &this->textureFire; }
+  Texture *getTextureDialogBox() { return &this->textureDialogBox; }
 
   vector<Texture> *getVectorSquareButtons() {
     return &this->vectorSquareButtons;

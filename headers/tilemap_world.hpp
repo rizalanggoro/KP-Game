@@ -210,7 +210,7 @@ class Tilemap {
 
         // todo: draw war checkpoint
         {
-          this->textWarPoint.setString("Go to war!");
+          this->textWarPoint.setString(">> FIGHT! <<");
           this->textWarPoint.setFont(*this->asset->getFont());
           this->textWarPoint.setCharacterSize(16);
           this->textWarPoint.setFillColor(Color(107, 75, 91, 255));
