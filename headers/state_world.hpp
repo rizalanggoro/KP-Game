@@ -26,6 +26,8 @@ class StateWorld {
 
   float colliderMapSize = 32;
 
+  bool isInWarPoint = false;
+
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
     bool keyDown = Keyboard::isKeyPressed(Keyboard::Down);
@@ -127,6 +129,13 @@ class StateWorld {
     }
   }
 
+  void drawGui(RenderWindow &window) {
+    RectangleShape rect{};
+    rect.setFillColor(Color::Red);
+    rect.setSize(Vector2f(100, 100));
+    window.draw(rect);
+  }
+
  public:
   StateWorld(string *state, RenderWindow *window) {
     this->state = state;
@@ -151,6 +160,13 @@ class StateWorld {
     if (event.type == Event::Resized) {
       auto size = event.size;
       this->view.setSize(size.width, size.height);
+    } else if (event.type == Event::KeyPressed) {
+      auto code = event.key.code;
+      if (code == Keyboard::Enter) {
+        if (this->isInWarPoint) {
+          *this->state = "war";
+        }
+      }
     }
   }
 
@@ -174,16 +190,18 @@ class StateWorld {
     tilemap.draw(window);
 
     // todo: draw sprite player
-    // auto winCenter = window.getView().getCenter();
-    // auto playerGlobalBounds =
-    // this->player.getSpritePlayer()->getGlobalBounds();
-    // this->player.getSpritePlayer()->setPosition(
-    //     winCenter.x - (playerGlobalBounds.width / 2),
-    //     winCenter.y - (playerGlobalBounds.height / 2));
     this->player.draw(window);
 
     // todo: draw leaf
     this->tilemap.drawLeaf(window);
+
+    this->window->setView(this->window->getDefaultView());
+    this->drawGui(window);
+
+    // todo: check player in war point
+    this->isInWarPoint =
+        this->player.getRectColliderBox()->getGlobalBounds().intersects(
+            this->tilemap.getTextWarPoint()->getGlobalBounds());
   }
 };
 

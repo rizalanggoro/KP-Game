@@ -14,9 +14,8 @@ class Asset {
  private:
   Font font{};
 
-  Texture tilledDirt{};
-
-  vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{};
+  vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{},
+      vectorDirt{};
 
   vector<Texture> vectorBoatColor1{};
   vector<Texture> vectorBoatColor3{};
@@ -28,8 +27,8 @@ class Asset {
   vector<vector<Texture>> vectorCharSpite{};
 
   vector<Texture> vectorSquareButtons{};
-
   vector<Texture> vectorGrassBiom{};
+  vector<Texture> vectorChest{};
 
   Texture textureFire{};
 
@@ -39,16 +38,30 @@ class Asset {
   }
 
   void loadTexture() {
-    loadTextureGrass();
-    loadTextureWater();
-    loadTextureBridge();
-    loadTextureBasicCharSprite();
+    this->loadTextureGrass();
+    this->loadTextureWater();
+    this->loadTextureBridge();
+    this->loadTextureDirt();
+    this->loadTextureBasicCharSprite();
 
     this->loadBoat();
     this->loadCannon();
     this->loadTextureFire();
     this->loadTextureSquareButtons();
     this->loadGrassBiom();
+    this->loadTextureChest();
+  }
+
+  void loadTextureChest() {
+    for (int r = 0; r < 2; r++) {
+      for (int c = 0; c < 5; c++) {
+        auto path = "assets/images/Chest.png";
+        Texture texture{};
+        if (texture.loadFromFile(path, IntRect(c * 48, r * 48, 48, 48)))
+          cout << "chest loaded!" << endl;
+        this->vectorChest.push_back(texture);
+      }
+    }
   }
 
   void loadGrassBiom() {
@@ -92,6 +105,18 @@ class Asset {
         vectorChar.push_back(texture);
       }
       this->vectorCharSpite.push_back(vectorChar);
+    }
+  }
+
+  void loadTextureDirt() {
+    for (int h = 0; h < 8; h++) {
+      for (int w = 0; w < 8; w++) {
+        string path = "assets/images/Tilled Dirt.png";
+        Texture texture{};
+        if (texture.loadFromFile(path, IntRect(w * 16, h * 16, 16, 16)))
+          cout << "dirt tiled loaded!" << endl;
+        vectorDirt.push_back(texture);
+      }
     }
   }
 
@@ -196,9 +221,12 @@ class Asset {
     this->loadFont();
   }
 
+  Font *getFont() { return &this->font; }
+
   vector<Texture> *getVectorWater() { return &vectorWater; };
   vector<Texture> *getVectorGrass() { return &vectorGrass; };
   vector<Texture> *getVectorWoodBridge() { return &vectorWoodBridge; };
+  vector<Texture> *getVectorDirt() { return &vectorDirt; };
   vector<vector<Texture>> *getVectorCharSpite() { return &vectorCharSpite; };
 
   vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
@@ -209,6 +237,7 @@ class Asset {
   vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
 
   vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
+  vector<Texture> *getVectorChest() { return &this->vectorChest; }
 
   Texture *getTextureFire() { return &this->textureFire; }
 

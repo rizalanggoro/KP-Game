@@ -17,12 +17,9 @@ class Tilemap {
  private:
   Asset *asset;
 
-  vector<int> vectorTilelayerGrass{};
-  vector<int> vectorTilelayerDirt{};
-  vector<int> vectorTilelayerBridge{};
-  vector<int> vectorTilelayerCollision{};
-  vector<int> vectorTilelayerTrunk{};
-  vector<int> vectorTilelayerLeaf{};
+  vector<int> vectorTilelayerGrass{}, vectorTilelayerDirt{},
+      vectorTilelayerBridge{}, vectorTilelayerCollision{},
+      vectorTilelayerTrunk{}, vectorTilelayerLeaf{};
 
   vector<RectangleShape> vectorCollision{};
 
@@ -37,6 +34,13 @@ class Tilemap {
   float waterDelay = 250;
   float waterInterval = 0;
   int currWaterIndex = 0;
+
+  Clock clockChest{};
+  float chestDelay = 250;
+  float chestInterval = 0;
+  int currChestIndex = 0;
+
+  Text textWarPoint{};
 
   void loadMapJson() {
     ifstream file("assets/map/game.tmj");
@@ -89,6 +93,7 @@ class Tilemap {
   int getHeight() { return height; }
   int getWidth() { return width; }
   float getTileTargetSize() { return this->tileTargetSize; }
+  Text *getTextWarPoint() { return &this->textWarPoint; }
 
   Tilemap(Asset *asset) {
     this->asset = asset;
@@ -102,6 +107,15 @@ class Tilemap {
   void draw(RenderWindow &window) {
     // todo: water animation
     waterInterval = clockWater.getElapsedTime().asMilliseconds();
+    this->chestInterval = this->clockChest.getElapsedTime().asMilliseconds();
+
+    if (this->chestInterval >= this->chestDelay) {
+      if (currChestIndex < 4)
+        currChestIndex++;
+      else
+        currChestIndex = 0;
+      clockChest.restart();
+    }
 
     if (waterInterval >= waterDelay) {
       if (currWaterIndex < (64 / 16) - 1)
@@ -175,6 +189,53 @@ class Tilemap {
 
             window.draw(sprite);
           }
+        }
+
+        // todo: draw dirt
+        {
+          int firstGid = 93;
+          int tileType = this->vectorTilelayerDirt.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorDirt()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
+        // todo: draw war checkpoint
+        {
+          this->textWarPoint.setString("Go to war!");
+          this->textWarPoint.setFont(*this->asset->getFont());
+          this->textWarPoint.setCharacterSize(16);
+          this->textWarPoint.setFillColor(Color(107, 75, 91, 255));
+
+          auto tBounds = this->textWarPoint.getGlobalBounds();
+          float marginX = ((6 * tileTargetSize) - tBounds.width) / 2;
+          float marginY = ((6 * tileTargetSize) - tBounds.height) / 2;
+          this->textWarPoint.setPosition(30 * this->tileTargetSize + marginX,
+                                         17 * this->tileTargetSize + marginY);
+          window.draw(this->textWarPoint);
+
+          float chestSize = 48;
+          float chestTargetSize = 48 * 3;
+          float chestScaleFactor = chestTargetSize / chestSize;
+
+          Sprite spriteChest{};
+          spriteChest.setTexture(
+              this->asset->getVectorChest()->at(this->currChestIndex));
+          spriteChest.setScale(chestScaleFactor, chestScaleFactor);
+
+          auto tPos = this->textWarPoint.getPosition();
+          spriteChest.setPosition(
+              tPos.x + ((tBounds.width - chestTargetSize) / 2),
+              tPos.y - chestTargetSize * 3 / 4);
+          window.draw(spriteChest);
         }
 
         index++;
