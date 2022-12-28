@@ -29,9 +29,9 @@ class Asset {
   vector<Texture> vectorSquareButtons{};
   vector<Texture> vectorGrassBiom{};
   vector<Texture> vectorChest{};
-  vector<Texture> vectorSettingMenu{};
   vector<Texture> vectorHome{};
 
+  Texture textureBackgroundMenu{};
   Texture textureFire{};
   Texture textureDialogBox{};
 
@@ -78,12 +78,7 @@ class Asset {
 
   void loadTextureSettingMenu() {
     string path = "assets/images/Setting menu.png";
-    for (int a = 0; a < 2; a++) {
-      Texture texture{};
-      if (texture.loadFromFile(path, IntRect(a * 128, 0, 128, 144)))
-        cout << "setting menu loaded!" << endl;
-      this->vectorSettingMenu.push_back(texture);
-    }
+    this->textureBackgroundMenu.loadFromFile(path);
   }
 
   void loadTextureChest() {
@@ -272,10 +267,10 @@ class Asset {
 
   vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
   vector<Texture> *getVectorChest() { return &this->vectorChest; }
-  vector<Texture> *getVectorSettingMenu() { return &this->vectorSettingMenu; }
   vector<Texture> *getVectorHome() { return &this->vectorHome; }
 
   Texture *getTextureFire() { return &this->textureFire; }
+  Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
 
   vector<Texture> *getVectorSquareButtons() {
     return &this->vectorSquareButtons;

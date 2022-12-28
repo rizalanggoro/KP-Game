@@ -29,7 +29,7 @@ class StateWorld {
   bool isInWarPoint = false;
   bool isInShopPoint = false;
   bool isPaused = false;
-  bool isShopOpenned = true;
+  bool isShopOpenned = false;
 
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
@@ -150,7 +150,82 @@ class StateWorld {
             window, "Wanna upgrade something?\nEnter for upgrade something.");
       }
       if (this->isShopOpenned) {
+        this->drawShop(window);
       }
+    }
+  }
+
+  void drawShop(RenderWindow &window) {
+    RectangleShape bgDark{};
+    bgDark.setFillColor(Color(0, 0, 0, 100));
+    bgDark.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    window.draw(bgDark);
+
+    auto wCenter = window.getView().getCenter();
+    float scaleFactor = (720 - 96) / 122;
+
+    Sprite background{};
+    background.setTexture(*this->asset.getTextureBackgroundMenu());
+    background.setScale(scaleFactor, scaleFactor);
+    auto bgSize = background.getGlobalBounds();
+    background.setPosition(wCenter.x - bgSize.width / 2,
+                           wCenter.y - bgSize.height / 2);
+    window.draw(background);
+
+    auto bgPos = background.getPosition();
+
+    Text title{};
+    title.setString("UPGRADE");
+    title.setFont(*this->asset.getFont());
+    title.setOutlineColor(Color(124, 153, 159, 255));
+    title.setOutlineThickness(3);
+    title.setLetterSpacing(1.32);
+    title.setCharacterSize(24);
+
+    auto titleBounds = title.getGlobalBounds();
+
+    title.setPosition(bgPos.x + (bgSize.width - titleBounds.width) / 2,
+                      bgPos.y + 48);
+    window.draw(title);
+
+    auto titlePos = title.getPosition();
+
+    // todo: draw boat list
+    auto bgBoatSize = (bgSize.width - 64) / 4;
+    float bgBoatScaleFactor = bgBoatSize / 32;
+    int prices[] = {0, 300, 600, 1200};
+    for (int a = 0; a < 4; a++) {
+      Sprite bgBoat{};
+      bgBoat.setTexture(this->asset.getVectorSquareButtons()->at(0));
+      bgBoat.setTextureRect(IntRect(8, 8, 32, 32));
+      bgBoat.setPosition(bgPos.x + (a * bgBoatSize) + 32, titlePos.y + 48);
+      bgBoat.setScale(bgBoatScaleFactor, bgBoatScaleFactor);
+      window.draw(bgBoat);
+
+      auto bgBoatPos = bgBoat.getPosition();
+      auto boatScaleFactor = (bgBoatSize - 32) / 128;
+
+      Sprite boat{};
+      boat.setTexture(this->asset.getVectorBoatColor1()->at(a));
+      boat.setScale(boatScaleFactor, boatScaleFactor);
+      auto boatBounds = boat.getGlobalBounds();
+      boat.setPosition(bgBoatPos.x + (bgBoatSize - boatBounds.width) / 2,
+                       bgBoatPos.y + (bgBoatSize - boatBounds.height) / 2);
+      if (a > 0) boat.setColor(Color::Black);
+      window.draw(boat);
+
+      // todo: draw price
+      auto boatPos = boat.getPosition();
+      Text price{};
+      price.setFont(*this->asset.getFont());
+      price.setString("$" + to_string(prices[a]));
+      price.setCharacterSize(12);
+
+      auto priceBounds = price.getGlobalBounds();
+      price.setPosition(boatPos.x + (bgBoatSize - priceBounds.width - 32) / 2,
+                        boatPos.y + bgBoatSize);
+
+      window.draw(price);
     }
   }
 
@@ -163,7 +238,7 @@ class StateWorld {
     window.draw(bgDark);
 
     Sprite background{};
-    background.setTexture(this->asset.getVectorSettingMenu()->at(1));
+    background.setTexture(*this->asset.getTextureBackgroundMenu());
     background.setScale(720 / 128, window.getSize().y / 144);
 
     auto bgBounds = background.getGlobalBounds();
@@ -186,7 +261,7 @@ class StateWorld {
   }
 
   void drawInstruction(RenderWindow &window, string instruction) {
-     auto wSize = window.getSize();
+    auto wSize = window.getSize();
 
     Text text{};
     text.setLineSpacing(2);
@@ -238,16 +313,30 @@ class StateWorld {
         if (this->isInWarPoint) {
           *this->state = "war";
         }
+        if (this->isInShopPoint) {
+          this->isShopOpenned = true;
+        }
       } else if (code == Keyboard::Escape) {
-        this->isPaused = !this->isPaused;
+        if (this->isShopOpenned) {
+          this->isShopOpenned = false;
+        } else {
+          if (this->isPaused) {
+            this->isPaused = false;
+          } else {
+            this->isPaused = true;
+          }
+        }
       }
     }
   }
 
   void run(RenderWindow &window) {
+    if (!this->isPaused && !this->isShopOpenned) {
+      this->handleKeyboard();
+    }
+
     window.setView(view);
 
-    this->handleKeyboard();
     this->playerRealPos = window.mapCoordsToPixel(
         this->player.getRectColliderBox()->getPosition());
 
