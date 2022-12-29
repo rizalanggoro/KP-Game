@@ -14,7 +14,7 @@ using namespace std;
 int main() {
   RenderWindow window(VideoMode(1280, 720), "SFML | Game Fix InsyaAllah",
                       Style::Default);
-  // window.setFramerateLimit(60);
+  window.setFramerateLimit(60);
 
   string state = "world";
 
@@ -23,7 +23,13 @@ int main() {
   StateWorld stateWorld{&state, &window};
   StateWar stateWar{&state, &window};
 
+  // float elapsedTime = 0;
+  // Clock clock;
+
   while (window.isOpen()) {
+    // elapsedTime = clock.restart().asSeconds() * 60;
+    // cout << "elapsed time: " << elapsedTime << endl;
+
     Event event{};
     while (window.pollEvent(event)) {
       if (event.type == Event::Closed) window.close();
