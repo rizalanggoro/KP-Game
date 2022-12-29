@@ -6,6 +6,7 @@
     "future": "cpp",
     "list": "cpp",
     "xhash": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "memory": "cpp"
   }
 }

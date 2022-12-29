@@ -17,7 +17,7 @@ class StateWar {
   string *state;
   RenderWindow *window;
 
-  Asset asset{};
+  Asset asset{"war"};
   View view{};
 
   TilemapWar tilemapWar{&asset};
@@ -173,6 +173,8 @@ class StateWar {
         this->playerBoat.previousBoat();
       } else if (code == Keyboard::E) {
         this->playerBoat.nextBoat();
+      } else if (code == Keyboard::Escape) {
+        *this->state = "world";
       }
     }
   }

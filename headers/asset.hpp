@@ -2,6 +2,8 @@
 #define asset_hpp
 
 #include <SFML/Graphics.hpp>
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 
 #include "json.hpp"
@@ -12,8 +14,11 @@ using json = nlohmann::json;
 
 class Asset {
  private:
+  string state;
+
   Font font{};
 
+  vector<int> vectorContainGrass{}, vectorContainDirt{}, vectorContainBridge{};
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{},
       vectorDirt{};
 
@@ -33,7 +38,7 @@ class Asset {
 
   Texture textureBackgroundMenu{};
   Texture textureFire{};
-  Texture textureDialogBox{};
+  // Texture textureDialogBox{};
 
   void loadFont() {
     string path = "assets/fonts/PressStart2P-Regular.ttf";
@@ -41,21 +46,24 @@ class Asset {
   }
 
   void loadTexture() {
+    if (this->state == "world") {
+      this->loadTextureDirt();
+      this->loadTextureBridge();
+      this->loadTextureBasicCharSprite();
+      this->loadGrassBiom();
+      this->loadTextureHome();
+      this->loadTextureChest();
+    } else if (this->state == "war") {
+      this->loadTextureFire();
+    }
+
     this->loadTextureGrass();
     this->loadTextureWater();
-    this->loadTextureBridge();
-    this->loadTextureDirt();
-    this->loadTextureBasicCharSprite();
-
     this->loadBoat();
     this->loadCannon();
-    this->loadTextureFire();
     this->loadTextureSquareButtons();
-    this->loadGrassBiom();
-    this->loadTextureChest();
     this->loadTextureSettingMenu();
-    this->loadTextureDialogBox();
-    this->loadTextureHome();
+    // this->loadTextureDialogBox();
   }
 
   void loadTextureHome() {
@@ -70,11 +78,11 @@ class Asset {
     }
   }
 
-  void loadTextureDialogBox() {
-    string path = "assets/images/dialog box.png";
-    if (this->textureDialogBox.loadFromFile(path))
-      cout << "dialog box loaded!" << endl;
-  }
+  // void loadTextureDialogBox() {
+  //   string path = "assets/images/dialog box.png";
+  //   if (this->textureDialogBox.loadFromFile(path))
+  //     cout << "dialog box loaded!" << endl;
+  // }
 
   void loadTextureSettingMenu() {
     string path = "assets/images/Setting menu.png";
@@ -138,13 +146,21 @@ class Asset {
   }
 
   void loadTextureDirt() {
+    int firstGid = this->state == "world" ? 93 : -1;
+    int index = 0;
     for (int h = 0; h < 8; h++) {
       for (int w = 0; w < 8; w++) {
         string path = "assets/images/Tilled Dirt.png";
         Texture texture{};
-        if (texture.loadFromFile(path, IntRect(w * 16, h * 16, 16, 16)))
-          cout << "dirt tiled loaded!" << endl;
+
+        if (find(this->vectorContainDirt.begin(), this->vectorContainDirt.end(),
+                 (index + firstGid)) != this->vectorContainDirt.end()) {
+          if (texture.loadFromFile(path, IntRect(w * 16, h * 16, 16, 16)))
+            cout << "dirt tiled loaded!" << endl;
+        }
+
         vectorDirt.push_back(texture);
+        index++;
       }
     }
   }
@@ -153,13 +169,23 @@ class Asset {
     int imageHeight = 48;
     int imageWidth = 80;
 
+    int firstGid = this->state == "world" ? 78 : 0;
+    int index = 0;
+
     for (int a = 0; a < (imageHeight / 16); a++) {
       for (int b = 0; b < (imageWidth / 16); b++) {
         Texture texture{};
         auto path = "assets/images/Wood Bridge.png";
-        if (texture.loadFromFile(path, IntRect(b * 16, a * 16, 16, 16)))
-          cout << "wood bridge tiled loaded!" << endl;
+
+        if (find(this->vectorContainBridge.begin(),
+                 this->vectorContainBridge.end(),
+                 (index + firstGid)) != this->vectorContainBridge.end()) {
+          if (texture.loadFromFile(path, IntRect(b * 16, a * 16, 16, 16)))
+            cout << "wood bridge tiled loaded!" << endl;
+        }
+
         vectorWoodBridge.push_back(texture);
+        index++;
       }
     }
   }
@@ -168,13 +194,24 @@ class Asset {
     int imageHeight = 112;
     int imageWidth = 176;
 
+    int firstGid = -1;
+    if (this->state == "world") firstGid = 1;
+    if (this->state == "war") firstGid = 5;
+
+    int index = 0;
     for (int a = 0; a < (imageHeight / 16); a++) {
       for (int b = 0; b < (imageWidth / 16); b++) {
         Texture texture{};
         auto path = "assets/images/Grass tiles v.2.png";
-        if (texture.loadFromFile(path, IntRect(b * 16, a * 16, 16, 16)))
-          cout << "grass tiled loaded!" << endl;
+        if (find(this->vectorContainGrass.begin(),
+                 this->vectorContainGrass.end(),
+                 (index + firstGid)) != this->vectorContainGrass.end()) {
+          if (texture.loadFromFile(path, IntRect(b * 16, a * 16, 16, 16)))
+            cout << "grass tiled loaded!" << endl;
+        }
         vectorGrass.push_back(texture);
+
+        index++;
       }
     }
   }
@@ -244,8 +281,41 @@ class Asset {
     }
   }
 
+  void loadMapJson() {
+    if (this->state == "world") {
+      ifstream file("assets/map/game.tmj");
+      json data = json::parse(file);
+      auto layers = data["layers"];
+      for (auto it = layers.begin(); it != layers.end(); it++) {
+        auto layer = it.value();
+        string layername = layer["name"].get<string>();
+        if (layername == "grass")
+          this->vectorContainGrass = layer["data"].get<vector<int>>();
+        if (layername == "dirt")
+          this->vectorContainDirt = layer["data"].get<vector<int>>();
+        if (layername == "bridge")
+          this->vectorContainBridge = layer["data"].get<vector<int>>();
+      }
+
+    } else if (this->state == "war") {
+      ifstream file("assets/map/map-war.tmj");
+      json data = json::parse(file);
+      auto layers = data["layers"];
+      for (auto it = layers.begin(); it != layers.end(); it++) {
+        auto layer = it.value();
+        string layername = layer["name"].get<string>();
+        if (layername == "grass") {
+          this->vectorContainGrass = layer["data"].get<vector<int>>();
+        }
+      }
+    }
+  }
+
  public:
-  Asset() {
+  Asset(string state) {
+    this->state = state;
+
+    this->loadMapJson();
     this->loadTexture();
     this->loadFont();
   }

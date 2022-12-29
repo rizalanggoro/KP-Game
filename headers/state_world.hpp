@@ -18,7 +18,7 @@ class StateWorld {
   View view, viewGui;
   RenderWindow *window;
 
-  Asset asset{};
+  Asset asset{"world"};
   Player player{&asset};
   Tilemap tilemap{&asset};
 
