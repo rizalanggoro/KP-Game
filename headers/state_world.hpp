@@ -3,12 +3,15 @@
 
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 
 #include "asset.hpp"
+#include "json.hpp"
 #include "player.hpp"
 #include "tilemap_world.hpp"
 
+using json = nlohmann::json;
 using namespace std;
 using namespace sf;
 
@@ -17,6 +20,8 @@ class StateWorld {
   string *state;
   View view, viewGui;
   RenderWindow *window;
+
+  json jsonBoatsData;
 
   Asset asset{"world"};
   Player player{&asset};
@@ -30,10 +35,9 @@ class StateWorld {
   bool isInWarPoint = false;
   bool isInShopPoint = false;
   bool isPaused = false;
-  bool isShopOpenned = true;
+  bool isShopOpenned = false;
 
-  Sprite buttonClose{}, buttonUpDamage{}, buttonUpBoatVelocity{},
-      buttonUpBulletVelocity{}, buttonUpLife{};
+  Sprite buttonClose{};
   Sprite buttonBoat1{}, buttonBoat2{}, buttonBoat3{}, buttonBoat4{};
   int shopSelectedBoatIndex = 0;
 
@@ -230,7 +234,8 @@ class StateWorld {
       auto boatBounds = boat.getGlobalBounds();
       boat.setPosition(bgBoatPos.x + (bgBoatSize - boatBounds.width) / 2,
                        bgBoatPos.y + (bgBoatSize - boatBounds.height) / 2);
-      if (a > 0) boat.setColor(Color::Black);
+      if (!this->jsonBoatsData["boats"][a]["owned"].get<bool>())
+        boat.setColor(Color::Black);
       window.draw(boat);
 
       // todo: draw price
@@ -249,7 +254,8 @@ class StateWorld {
       if (a == 3) _bgBoatPos = buttonBoat->getPosition();
     }
 
-    string items[] = {"Damage", "Boat Velocity", "Bullet Velocity", "Life"};
+    string items[] = {"Damage", "Boat Speed", "Bullet Speed", "Life"};
+    // string itemKeys[] = {"damage", "boatV", "bulletV", "life"};
     for (int a = 0; a < 4; a++) {
       Text text{};
       text.setFont(*this->asset.getFont());
@@ -263,7 +269,11 @@ class StateWorld {
       auto textBounds = text.getGlobalBounds();
 
       //  todo: draw star / level
-      for (int b = 0; b < 5; b++) {
+      for (int b = 0;
+           b < this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]
+                                  ["levels"][a]
+                                      .get<int>();
+           b++) {
         float targetStarSize = 32;
         Sprite star{};
         star.setTexture(*this->asset.getTextureStar());
@@ -273,18 +283,18 @@ class StateWorld {
         window.draw(star);
       }
 
-      // todo: draw button upgrade
-      float buttoUpgradeTargetSize = 64;
-      Sprite *buttonUp;
-      if (a == 0) buttonUp = &this->buttonUpDamage;
-      if (a == 1) buttonUp = &this->buttonUpBoatVelocity;
-      if (a == 2) buttonUp = &this->buttonUpBulletVelocity;
-      if (a == 3) buttonUp = &this->buttonUpLife;
-      buttonUp->setTexture(*this->asset.getTextureButtonPlus());
-      buttonUp->setPosition(bgPos.x + bgSize.width - (64 + 48), textPos.y);
-      buttonUp->setScale(buttoUpgradeTargetSize / 24,
-                         buttoUpgradeTargetSize / 24);
-      window.draw(*buttonUp);
+      // // todo: draw button upgrade
+      // float buttoUpgradeTargetSize = 64;
+      // Sprite *buttonUp;
+      // if (a == 0) buttonUp = &this->buttonUpDamage;
+      // if (a == 1) buttonUp = &this->buttonUpBoatVelocity;
+      // if (a == 2) buttonUp = &this->buttonUpBulletVelocity;
+      // if (a == 3) buttonUp = &this->buttonUpLife;
+      // buttonUp->setTexture(*this->asset.getTextureButtonPlus());
+      // buttonUp->setPosition(bgPos.x + bgSize.width - (64 + 48), textPos.y);
+      // buttonUp->setScale(buttoUpgradeTargetSize / 24,
+      //                    buttoUpgradeTargetSize / 24);
+      // window.draw(*buttonUp);
 
       window.draw(text);
     }
@@ -340,10 +350,28 @@ class StateWorld {
     window.draw(text);
   }
 
+  void loadJsonBoatsData() {
+    string path = "data/boats.json";
+
+    ifstream file(path);
+    this->jsonBoatsData = json::parse(file);
+  }
+
+  void saveJsonData() {
+    // string path = "data/save.json";
+
+    // ofstream file(path);
+    // if (file << this->jsonData) {
+    //   // this->loadJsonData();
+    // }
+  }
+
  public:
   StateWorld(string *state, RenderWindow *window) {
     this->state = state;
     this->window = window;
+
+    this->loadJsonBoatsData();
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
@@ -394,18 +422,30 @@ class StateWorld {
       if (this->buttonClose.getGlobalBounds().contains(mx, my)) {
         this->isShopOpenned = false;
       }
-      if (this->buttonUpDamage.getGlobalBounds().contains(mx, my)) {
-        cout << "up damage called" << endl;
-      }
-      if (this->buttonUpBoatVelocity.getGlobalBounds().contains(mx, my)) {
-        cout << "up boat v called" << endl;
-      }
-      if (this->buttonUpBulletVelocity.getGlobalBounds().contains(mx, my)) {
-        cout << "up bullet v called" << endl;
-      }
-      if (this->buttonUpLife.getGlobalBounds().contains(mx, my)) {
-        cout << "up life called" << endl;
-      }
+      // if (this->buttonUpDamage.getGlobalBounds().contains(mx, my)) {
+      //   int level =
+      //       this->jsonData["boats"][this->shopSelectedBoatIndex]["damage"]
+      //           .get<int>();
+
+      //   if (event.mouseButton.button == Mouse::Left) {
+      //     cout << "left clicked!" << endl;
+      //     level++;
+      //   } else {
+      //     cout << "right clicked!" << endl;
+      //     level--;
+      //   }
+      //   this->jsonData["boats"][this->shopSelectedBoatIndex]["damage"] =
+      //   level; this->saveJsonData();
+      // }
+      // if (this->buttonUpBoatVelocity.getGlobalBounds().contains(mx, my)) {
+      //   cout << "up boat v called" << endl;
+      // }
+      // if (this->buttonUpBulletVelocity.getGlobalBounds().contains(mx, my)) {
+      //   cout << "up bullet v called" << endl;
+      // }
+      // if (this->buttonUpLife.getGlobalBounds().contains(mx, my)) {
+      //   cout << "up life called" << endl;
+      // }
 
       if (this->buttonBoat1.getGlobalBounds().contains(mx, my))
         this->shopSelectedBoatIndex = 0;

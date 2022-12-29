@@ -31,7 +31,7 @@ class PlayerBoat {
   float boatCannonTargetSize = 1;
   float boatCannonScaleFactor = 1;
 
-  float velocity = 3;
+  float velocity = 1;
 
   RectangleShape colliderBox{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
