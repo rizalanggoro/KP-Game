@@ -19,31 +19,20 @@ int main() {
   string state = "world";
 
   // todo: states
-  // StateTest stateTest{&state, &window};
   StateWorld stateWorld{&state, &window};
   StateWar stateWar{&state, &window};
 
-  // float elapsedTime = 0;
-  // Clock clock;
-
   while (window.isOpen()) {
-    // elapsedTime = clock.restart().asSeconds() * 60;
-    // cout << "elapsed time: " << elapsedTime << endl;
-
     Event event{};
     while (window.pollEvent(event)) {
       if (event.type == Event::Closed) window.close();
-      // if (event.type == Event::KeyPressed)
-      //   if (event.key.code == Keyboard::Escape) window.close();
 
-      // if (state == "test") stateTest.handleEvent(event);
       if (state == "world") stateWorld.handleEvent(event);
       if (state == "war") stateWar.handleEvent(event);
     }
 
     window.clear(Color::White);
 
-    // if (state == "test") stateTest.run(window);
     if (state == "world") stateWorld.run(window);
     if (state == "war") stateWar.run(window);
 

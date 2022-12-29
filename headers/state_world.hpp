@@ -23,13 +23,19 @@ class StateWorld {
   Tilemap tilemap{&asset};
 
   Vector2i playerRealPos;
+  Vector2i mouseRealPos;
 
   float colliderMapSize = 48;
 
   bool isInWarPoint = false;
   bool isInShopPoint = false;
   bool isPaused = false;
-  bool isShopOpenned = false;
+  bool isShopOpenned = true;
+
+  Sprite buttonClose{}, buttonUpDamage{}, buttonUpBoatVelocity{},
+      buttonUpBulletVelocity{}, buttonUpLife{};
+  Sprite buttonBoat1{}, buttonBoat2{}, buttonBoat3{}, buttonBoat4{};
+  int shopSelectedBoatIndex = 0;
 
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
@@ -174,6 +180,12 @@ class StateWorld {
 
     auto bgPos = background.getPosition();
 
+    // todo: draw button close
+    buttonClose.setTexture(*this->asset.getTextureButtonClose());
+    buttonClose.setPosition(bgPos.x + bgSize.width - 48, bgPos.y - 16);
+    buttonClose.setScale(64 / 20, 64 / 20);
+    window.draw(buttonClose);
+
     Text title{};
     title.setString("UPGRADE");
     title.setFont(*this->asset.getFont());
@@ -194,15 +206,22 @@ class StateWorld {
     auto bgBoatSize = (bgSize.width - 64) / 4;
     float bgBoatScaleFactor = bgBoatSize / 32;
     int prices[] = {0, 300, 600, 1200};
+    Vector2f _bgBoatPos;
     for (int a = 0; a < 4; a++) {
-      Sprite bgBoat{};
-      bgBoat.setTexture(this->asset.getVectorSquareButtons()->at(0));
-      bgBoat.setTextureRect(IntRect(8, 8, 32, 32));
-      bgBoat.setPosition(bgPos.x + (a * bgBoatSize) + 32, titlePos.y + 48);
-      bgBoat.setScale(bgBoatScaleFactor, bgBoatScaleFactor);
-      window.draw(bgBoat);
+      Sprite *buttonBoat;
+      if (a == 0) buttonBoat = &this->buttonBoat1;
+      if (a == 1) buttonBoat = &this->buttonBoat2;
+      if (a == 2) buttonBoat = &this->buttonBoat3;
+      if (a == 3) buttonBoat = &this->buttonBoat4;
 
-      auto bgBoatPos = bgBoat.getPosition();
+      buttonBoat->setTexture(this->asset.getVectorSquareButtons()->at(
+          this->shopSelectedBoatIndex == a ? 0 : 4));
+      buttonBoat->setTextureRect(IntRect(8, 8, 32, 32));
+      buttonBoat->setPosition(bgPos.x + (a * bgBoatSize) + 32, titlePos.y + 48);
+      buttonBoat->setScale(bgBoatScaleFactor, bgBoatScaleFactor);
+      window.draw(*buttonBoat);
+
+      auto bgBoatPos = buttonBoat->getPosition();
       auto boatScaleFactor = (bgBoatSize - 32) / 128;
 
       Sprite boat{};
@@ -219,13 +238,55 @@ class StateWorld {
       Text price{};
       price.setFont(*this->asset.getFont());
       price.setString("$" + to_string(prices[a]));
-      price.setCharacterSize(12);
+      price.setCharacterSize(16);
 
       auto priceBounds = price.getGlobalBounds();
       price.setPosition(boatPos.x + (bgBoatSize - priceBounds.width - 32) / 2,
                         boatPos.y + bgBoatSize);
 
       window.draw(price);
+
+      if (a == 3) _bgBoatPos = buttonBoat->getPosition();
+    }
+
+    string items[] = {"Damage", "Boat Velocity", "Bullet Velocity", "Life"};
+    for (int a = 0; a < 4; a++) {
+      Text text{};
+      text.setFont(*this->asset.getFont());
+      text.setString(items[a]);
+      text.setCharacterSize(16);
+      text.setFillColor(Color::White);
+      text.setPosition(bgPos.x + 48,
+                       _bgBoatPos.y + bgBoatSize + (a * (32 + 40)) + 64);
+
+      auto textPos = text.getPosition();
+      auto textBounds = text.getGlobalBounds();
+
+      //  todo: draw star / level
+      for (int b = 0; b < 5; b++) {
+        float targetStarSize = 32;
+        Sprite star{};
+        star.setTexture(*this->asset.getTextureStar());
+        star.setPosition(textPos.x + (b * 40),
+                         textPos.y + textBounds.height + 8);
+        star.setScale(targetStarSize / 14, targetStarSize / 14);
+        window.draw(star);
+      }
+
+      // todo: draw button upgrade
+      float buttoUpgradeTargetSize = 64;
+      Sprite *buttonUp;
+      if (a == 0) buttonUp = &this->buttonUpDamage;
+      if (a == 1) buttonUp = &this->buttonUpBoatVelocity;
+      if (a == 2) buttonUp = &this->buttonUpBulletVelocity;
+      if (a == 3) buttonUp = &this->buttonUpLife;
+      buttonUp->setTexture(*this->asset.getTextureButtonPlus());
+      buttonUp->setPosition(bgPos.x + bgSize.width - (64 + 48), textPos.y);
+      buttonUp->setScale(buttoUpgradeTargetSize / 24,
+                         buttoUpgradeTargetSize / 24);
+      window.draw(*buttonUp);
+
+      window.draw(text);
     }
   }
 
@@ -293,11 +354,11 @@ class StateWorld {
     auto width = this->tilemap.getWidth();
     auto height = this->tilemap.getHeight();
 
-    this->player.setPosition(15 * this->tilemap.getTileTargetSize(),
-                             18 * this->tilemap.getTileTargetSize());
+    this->player.setPosition(17 * this->tilemap.getTileTargetSize(),
+                             19 * this->tilemap.getTileTargetSize());
     this->view.move(
         this->tilemap.getWidth() / 2 * this->tilemap.getTileTargetSize(),
-        this->tilemap.getHeight() / 1.5 * this->tilemap.getTileTargetSize());
+        this->tilemap.getHeight() / 2 * this->tilemap.getTileTargetSize());
   }
 
   void handleEvent(Event &event) {
@@ -327,10 +388,39 @@ class StateWorld {
           }
         }
       }
+    } else if (event.type == Event::MouseButtonPressed) {
+      auto mx = this->mouseRealPos.x;
+      auto my = this->mouseRealPos.y;
+      if (this->buttonClose.getGlobalBounds().contains(mx, my)) {
+        this->isShopOpenned = false;
+      }
+      if (this->buttonUpDamage.getGlobalBounds().contains(mx, my)) {
+        cout << "up damage called" << endl;
+      }
+      if (this->buttonUpBoatVelocity.getGlobalBounds().contains(mx, my)) {
+        cout << "up boat v called" << endl;
+      }
+      if (this->buttonUpBulletVelocity.getGlobalBounds().contains(mx, my)) {
+        cout << "up bullet v called" << endl;
+      }
+      if (this->buttonUpLife.getGlobalBounds().contains(mx, my)) {
+        cout << "up life called" << endl;
+      }
+
+      if (this->buttonBoat1.getGlobalBounds().contains(mx, my))
+        this->shopSelectedBoatIndex = 0;
+      if (this->buttonBoat2.getGlobalBounds().contains(mx, my))
+        this->shopSelectedBoatIndex = 1;
+      if (this->buttonBoat3.getGlobalBounds().contains(mx, my))
+        this->shopSelectedBoatIndex = 2;
+      if (this->buttonBoat4.getGlobalBounds().contains(mx, my))
+        this->shopSelectedBoatIndex = 3;
     }
   }
 
   void run(RenderWindow &window) {
+    this->mouseRealPos = Mouse::getPosition(window);
+
     if (!this->isPaused && !this->isShopOpenned) {
       this->handleKeyboard();
     }

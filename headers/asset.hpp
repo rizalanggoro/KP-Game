@@ -37,7 +37,10 @@ class Asset {
   vector<Texture> vectorHome{};
 
   Texture textureBackgroundMenu{};
+  Texture textureButtonClose{};
+  Texture textureButtonPlus{};
   Texture textureFire{};
+  Texture textureStar{};
   // Texture textureDialogBox{};
 
   void loadFont() {
@@ -87,6 +90,9 @@ class Asset {
   void loadTextureSettingMenu() {
     string path = "assets/images/Setting menu.png";
     this->textureBackgroundMenu.loadFromFile(path);
+    this->textureButtonClose.loadFromFile("assets/images/Button close.png");
+    this->textureStar.loadFromFile("assets/images/Star.png");
+    this->textureButtonPlus.loadFromFile("assets/images/Button Plus.png");
   }
 
   void loadTextureChest() {
@@ -340,6 +346,9 @@ class Asset {
   vector<Texture> *getVectorHome() { return &this->vectorHome; }
 
   Texture *getTextureFire() { return &this->textureFire; }
+  Texture *getTextureStar() { return &this->textureStar; }
+  Texture *getTextureButtonClose() { return &this->textureButtonClose; }
+  Texture *getTextureButtonPlus() { return &this->textureButtonPlus; }
   Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
 
   vector<Texture> *getVectorSquareButtons() {
