@@ -22,6 +22,9 @@ class StateWorld {
   Player player{&asset};
   Tilemap tilemap{&asset};
 
+  Clock clock;
+  float elapsedTime = 0;
+
   Vector2i playerRealPos;
 
   float colliderMapSize = 48;
@@ -108,25 +111,25 @@ class StateWorld {
     else if (keyDown) {
       if (this->tilemap.canMove(player, "d")) {
         if (this->playerRealPos.y >= mapMaxY)
-          this->view.move(0, this->player.getVelocity());
+          this->view.move(0, this->player.getVelocity() * this->elapsedTime);
         this->player.moveDown();
       }
     } else if (keyUp) {
       if (this->tilemap.canMove(player, "u")) {
         if (this->playerRealPos.y <= mapMin)
-          this->view.move(0, -this->player.getVelocity());
+          this->view.move(0, -this->player.getVelocity() * this->elapsedTime);
         this->player.moveUp();
       }
     } else if (keyLeft) {
       if (this->tilemap.canMove(player, "l")) {
         if (this->playerRealPos.x <= mapMin)
-          this->view.move(-this->player.getVelocity(), 0);
+          this->view.move(-this->player.getVelocity() * this->elapsedTime, 0);
         this->player.moveLeft();
       }
     } else if (keyRight) {
       if (this->tilemap.canMove(player, "r")) {
         if (this->playerRealPos.x >= mapMaxX)
-          this->view.move(this->player.getVelocity(), 0);
+          this->view.move(this->player.getVelocity() * this->elapsedTime, 0);
         this->player.moveRight();
       }
     }
@@ -331,6 +334,8 @@ class StateWorld {
   }
 
   void run(RenderWindow &window) {
+    this->elapsedTime = this->clock.restart().asSeconds() * 60;
+
     if (!this->isPaused && !this->isShopOpenned) {
       this->handleKeyboard();
     }

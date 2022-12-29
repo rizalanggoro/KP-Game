@@ -14,7 +14,7 @@ using namespace std;
 int main() {
   RenderWindow window(VideoMode(1280, 720), "SFML | Game Fix InsyaAllah",
                       Style::Default);
-  window.setFramerateLimit(60);
+  // window.setFramerateLimit(60);
 
   string state = "world";
 

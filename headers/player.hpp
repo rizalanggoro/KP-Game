@@ -14,6 +14,9 @@ class Player {
   Asset *asset;
   float velocity = 5;
 
+  Clock clock;
+  float elapsedTime = 0;
+
   Sprite spritePlayer{};
   Clock clockPlayer;
   float frameInterval;
@@ -61,29 +64,39 @@ class Player {
     this->playerScaleFactor = this->playerTargetSize / this->playerSize;
   }
 
-  void moveUp() { this->spritePlayer.move(0, -this->velocity); }
-  void moveDown() { this->spritePlayer.move(0, this->velocity); }
-  void moveRight() { this->spritePlayer.move(this->velocity, 0); }
-  void moveLeft() { this->spritePlayer.move(-this->velocity, 0); }
+  void moveUp() {
+    this->spritePlayer.move(0, -this->velocity * this->elapsedTime);
+  }
+  void moveDown() {
+    this->spritePlayer.move(0, this->velocity * this->elapsedTime);
+  }
+  void moveRight() {
+    this->spritePlayer.move(this->velocity * this->elapsedTime, 0);
+  }
+  void moveLeft() {
+    this->spritePlayer.move(-this->velocity * this->elapsedTime, 0);
+  }
   void moveUpRight() {
-    float speed = this->velocity * sqrt(2) / 2;
+    float speed = this->velocity * sqrt(2) / 2 * this->elapsedTime;
     this->spritePlayer.move(speed, -speed);
   }
   void moveUpLeft() {
-    float speed = this->velocity * sqrt(2) / 2;
+    float speed = this->velocity * sqrt(2) / 2 * this->elapsedTime;
     this->spritePlayer.move(-speed, -speed);
   }
   void moveDownRight() {
-    float speed = this->velocity * sqrt(2) / 2;
+    float speed = this->velocity * sqrt(2) / 2 * this->elapsedTime;
     this->spritePlayer.move(speed, speed);
   }
   void moveDownLeft() {
-    float speed = this->velocity * sqrt(2) / 2;
+    float speed = this->velocity * sqrt(2) / 2 * this->elapsedTime;
     this->spritePlayer.move(-speed, speed);
   }
   void setPosition(float x, float y) { this->spritePlayer.setPosition(x, y); }
 
   void draw(RenderWindow &window) {
+    this->elapsedTime = this->clock.restart().asSeconds() * 60;
+
     this->handleKeyboard();
 
     // todo: handle player frame
