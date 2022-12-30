@@ -17,19 +17,20 @@ class PlayerBoat {
   Asset *asset;
   TilemapWar *tilemap;
   Sprite player{};
-  Sprite playerCannon{};
+  // Sprite playerCannon{};
   vector<Fire> vectorFire{};
 
   string playerDirection = "d";
+  int boatLevel = 1;
 
   float boatSize = 128;
   float boatTargetSize = 80;
   // float boatTargetSize = 256;
   float boatScaleFactor = 1;
 
-  float boatCannonSize = 0;
-  float boatCannonTargetSize = 1;
-  float boatCannonScaleFactor = 1;
+  // float boatCannonSize = 0;
+  // float boatCannonTargetSize = 1;
+  // float boatCannonScaleFactor = 1;
 
   float velocity = 5;
 
@@ -69,18 +70,20 @@ class PlayerBoat {
   int getCurrentBoatIndex() { return this->currentBoatIndex; }
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
 
-  void nextBoat() {
-    if (this->currentBoatIndex < this->asset->getVectorBoatColor1()->size() - 1)
-      this->currentBoatIndex++;
-    else
-      this->currentBoatIndex = 0;
-  }
-  void previousBoat() {
-    if (this->currentBoatIndex > 0)
-      this->currentBoatIndex--;
-    else
-      this->currentBoatIndex = this->asset->getVectorBoatColor1()->size() - 1;
-  }
+  // void nextBoat() {
+  //   if (this->currentBoatIndex < this->asset->getVectorBoatColor1()->size() -
+  //   1)
+  //     this->currentBoatIndex++;
+  //   else
+  //     this->currentBoatIndex = 0;
+  // }
+  // void previousBoat() {
+  //   if (this->currentBoatIndex > 0)
+  //     this->currentBoatIndex--;
+  //   else
+  //     this->currentBoatIndex = this->asset->getVectorBoatColor1()->size() -
+  //     1;
+  // }
 
   void moveUpRight() {
     this->playerDirection = "ur";
@@ -125,24 +128,24 @@ class PlayerBoat {
     this->frameCannonInterval =
         this->clockFrameCannon.getElapsedTime().asMilliseconds();
 
-    if (this->frameCannonInterval >=
-        this->frameCannonDelay / this->asset->getVectorCannon4()->size()) {
-      if (this->currFrameCannonIndex <
-          this->asset->getVectorCannon4()->size() - 1)
-        this->currFrameCannonIndex++;
-      else {
-        this->currFrameCannonIndex = 0;
+    // if (this->frameCannonInterval >=
+    //     this->frameCannonDelay / this->asset->getVectorCannon4()->size()) {
+    //   if (this->currFrameCannonIndex <
+    //       this->asset->getVectorCannon4()->size() - 1)
+    //     this->currFrameCannonIndex++;
+    //   else {
+    //     this->currFrameCannonIndex = 0;
 
-        auto playerPos = this->player.getPosition();
-        Fire newFire{this->asset, this->playerDirection};
-        newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
-        newFire.setVelocity(this->velocity * 2);
+    //     auto playerPos = this->player.getPosition();
+    //     Fire newFire{this->asset, this->playerDirection};
+    //     newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
+    //     newFire.setVelocity(this->velocity * 2);
 
-        this->vectorFire.push_back(newFire);
-      }
+    //     this->vectorFire.push_back(newFire);
+    //   }
 
-      this->clockFrameCannon.restart();
-    }
+    //   this->clockFrameCannon.restart();
+    // }
   }
 
   PlayerBoat(Asset *asset, TilemapWar *tilemap) {
@@ -156,17 +159,19 @@ class PlayerBoat {
         this->tilemap->getHeight() * this->tilemap->getTileTargetSize() / 2 -
             this->boatTargetSize / 2);
 
-    this->boatCannonTargetSize = this->boatTargetSize / 2;
-    this->playerCannon.setTexture(this->asset->getVectorCannon4()->at(0));
-    this->boatCannonSize = this->playerCannon.getGlobalBounds().width;
-    this->boatCannonScaleFactor =
-        this->boatCannonTargetSize / this->boatCannonSize;
+    // this->boatCannonTargetSize = this->boatTargetSize / 2;
+    // this->playerCannon.setTexture(this->asset->getVectorCannon4()->at(0));
+    // this->boatCannonSize = this->playerCannon.getGlobalBounds().width;
+    // this->boatCannonScaleFactor =
+    //     this->boatCannonTargetSize / this->boatCannonSize;
   }
+
+  void setLevel(int level) { this->boatLevel = level; }
 
   void draw(RenderWindow &window) {
     // todo: draw boat
     this->player.setTexture(
-        this->asset->getVectorBoatColor1()->at(this->currentBoatIndex));
+        this->asset->getVectorBoats()->at(this->boatLevel - 1).at(0));
     this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->player.setRotation(this->parseDirection(this->playerDirection));
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
@@ -175,15 +180,15 @@ class PlayerBoat {
 
     // todo: draw cannon
     auto playerPos = this->player.getPosition();
-    this->playerCannon.setTexture(
-        this->asset->getVectorCannon4()->at(this->currFrameCannonIndex));
-    this->playerCannon.setPosition(playerPos.x, playerPos.y);
-    this->playerCannon.setOrigin(boatCannonSize / 2, boatCannonSize / 2);
-    this->playerCannon.setRotation(this->parseDirection(this->playerDirection));
-    this->playerCannon.setScale(this->boatCannonScaleFactor,
-                                this->boatCannonScaleFactor);
+    // this->playerCannon.setTexture(
+    //     this->asset->getVectorCannon4()->at(this->currFrameCannonIndex));
+    // this->playerCannon.setPosition(playerPos.x, playerPos.y);
+    // this->playerCannon.setOrigin(boatCannonSize / 2, boatCannonSize / 2);
+    // this->playerCannon.setRotation(this->parseDirection(this->playerDirection));
+    // this->playerCannon.setScale(this->boatCannonScaleFactor,
+    //                             this->boatCannonScaleFactor);
 
-    window.draw(this->playerCannon);
+    // window.draw(this->playerCannon);
 
     // todo: draw rect
     this->colliderBox.setFillColor(Color::Transparent);

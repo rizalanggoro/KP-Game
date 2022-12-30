@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "headers/asset.hpp"
+#include "headers/data.hpp"
 #include "headers/state_test.hpp"
 #include "headers/state_war.hpp"
 #include "headers/state_world.hpp"
@@ -13,14 +14,16 @@ using namespace std;
 
 int main() {
   RenderWindow window(VideoMode(1280, 720), "SFML | Game Fix InsyaAllah",
-                      Style::Default);
+                      Style::Close);
   window.setFramerateLimit(60);
 
-  string state = "world";
+  string state = "war";
+  Data data{};
+  data.load();
 
   // todo: states
-  StateWorld stateWorld{&state, &window};
-  StateWar stateWar{&state, &window};
+  StateWorld stateWorld{&state, &window, &data};
+  StateWar stateWar{&state, &window, &data};
 
   while (window.isOpen()) {
     Event event{};

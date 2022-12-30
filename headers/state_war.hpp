@@ -2,13 +2,17 @@
 #define state_war_hpp
 
 #include <SFML/Graphics.hpp>
+#include <fstream>
 #include <iostream>
 
 #include "asset.hpp"
+#include "data.hpp"
 #include "enemy_boat.hpp"
+#include "json.hpp"
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
 
+using json = nlohmann::json;
 using namespace std;
 using namespace sf;
 
@@ -16,13 +20,17 @@ class StateWar {
  private:
   string *state;
   RenderWindow *window;
+  Data *data;
 
   Asset asset{"war"};
   View view{};
 
   TilemapWar tilemapWar{&asset};
   PlayerBoat playerBoat{&asset, &tilemapWar};
-  // EnemyBoat enemyBoat{&asset, &tilemapWar, &playerBoat};
+
+  // json jsonBoats;
+  // json jsonProfile;
+  // bool isJsonLoaded = false;
 
   vector<EnemyBoat> vectorEnemyBoat{};
   Clock clockEnemyBoat;
@@ -118,36 +126,51 @@ class StateWar {
 
   void drawGuiProfile(RenderWindow &window) {
     // todo: gui selected boat
-    {
-      for (int a = 0; a < 4; a++) {
-        auto buttonSize = 136;
-        auto buttonScale = buttonSize / 48;
-        auto isSelected = this->playerBoat.getCurrentBoatIndex() == a;
+    // {
+    //   for (int a = 0; a < 4; a++) {
+    //     auto buttonSize = 136;
+    //     auto buttonScale = buttonSize / 48;
+    //     auto isSelected = this->playerBoat.getCurrentBoatIndex() == a;
 
-        Sprite spriteButton{};
-        spriteButton.setTexture(
-            this->asset.getVectorSquareButtons()->at(isSelected ? 0 : 4));
-        spriteButton.setPosition(buttonSize / 2 * a, 0);
-        spriteButton.setScale(buttonScale, buttonScale);
+    //     Sprite spriteButton{};
+    //     spriteButton.setTexture(
+    //         this->asset.getVectorSquareButtons()->at(isSelected ? 0 : 4));
+    //     spriteButton.setPosition(buttonSize / 2 * a, 0);
+    //     spriteButton.setScale(buttonScale, buttonScale);
 
-        window.draw(spriteButton);
+    //     window.draw(spriteButton);
 
-        float boatSize = 56;
-        float boatScale = boatSize / 128;
-        Sprite spriteBoat{};
-        spriteBoat.setTexture(this->asset.getVectorBoatColor1()->at(a));
-        spriteBoat.setScale(boatScale, boatScale);
-        spriteBoat.setPosition(a * buttonSize / 2 + 20, 20);
+    //     float boatSize = 56;
+    //     float boatScale = boatSize / 128;
+    //     Sprite spriteBoat{};
+    //     spriteBoat.setTexture(this->asset.getVectorBoatColor1()->at(a));
+    //     spriteBoat.setScale(boatScale, boatScale);
+    //     spriteBoat.setPosition(a * buttonSize / 2 + 20, 20);
 
-        window.draw(spriteBoat);
-      }
-    }
+    //     window.draw(spriteBoat);
+    //   }
+    // }
   }
 
+  // void loadJsonData() {
+  //   string pathBoats = "data/boats.json";
+  //   string pathProfile = "data/profile.json";
+
+  //   ifstream fileBoats(pathBoats);
+  //   this->jsonBoats = json::parse(fileBoats);
+
+  //   ifstream fileProfile(pathProfile);
+  //   this->jsonProfile = json::parse(fileProfile);
+  // }
+
  public:
-  StateWar(string *state, RenderWindow *window) {
+  StateWar(string *state, RenderWindow *window, Data *data) {
     this->state = state;
     this->window = window;
+    this->data = data;
+
+    // this->loadJsonData();
+    // this->playerBoat.setLevel(this->jsonProfile["selectedBoat"].get<int>());
 
     this->view = this->window->getDefaultView();
     this->view.setCenter(0, 0);
@@ -169,17 +192,20 @@ class StateWar {
       }
     } else if (event.type == Event::KeyPressed) {
       auto code = event.key.code;
-      if (code == Keyboard::Q) {
-        this->playerBoat.previousBoat();
-      } else if (code == Keyboard::E) {
-        this->playerBoat.nextBoat();
-      } else if (code == Keyboard::Escape) {
+      if (code == Keyboard::Escape) {
         *this->state = "world";
       }
     }
   }
 
   void run(RenderWindow &window) {
+    // if (!this->isJsonLoaded) {
+    //   this->loadJsonData();
+    // }
+
+    this->playerBoat.setLevel(
+        (*this->data->getJsonProfile())["selectedBoat"].get<int>());
+
     // todo: spawn enemy boat
     this->spawnEnemyBoatInterval =
         this->clockEnemyBoat.getElapsedTime().asMilliseconds();

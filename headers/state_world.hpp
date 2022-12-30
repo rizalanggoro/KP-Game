@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "data.hpp"
 #include "json.hpp"
 #include "player.hpp"
 #include "tilemap_world.hpp"
@@ -18,11 +19,12 @@ using namespace sf;
 class StateWorld {
  private:
   string *state;
+  Data *data;
   View view, viewGui;
   RenderWindow *window;
 
-  json jsonBoatsData;
-  json jsonProfile;
+  // json jsonBoatsData;
+  // json jsonProfile;
 
   Asset asset{"world"};
   Player player{&asset};
@@ -237,7 +239,8 @@ class StateWorld {
       boat.setPosition(bgBoatPos.x + (bgBoatSize - boatBounds.width) / 2,
                        bgBoatPos.y + (bgBoatSize - boatBounds.height) / 2);
 
-      bool isOwned = this->jsonBoatsData["boats"][a]["owned"].get<bool>();
+      bool isOwned =
+          (*this->data->getJsonBoats())["boats"][a]["owned"].get<bool>();
       if (!isOwned) boat.setColor(Color::Black);
       window.draw(boat);
 
@@ -248,7 +251,7 @@ class StateWorld {
       if (!isOwned)
         price.setString("$" + to_string(prices[a]));
       else {
-        if (this->jsonProfile["selectedBoat"] == (a + 1))
+        if ((*this->data->getJsonProfile())["selectedBoat"] == (a + 1))
           price.setString("Used");
       }
       price.setCharacterSize(16);
@@ -279,9 +282,10 @@ class StateWorld {
 
       //  todo: draw star / level
       for (int b = 0;
-           b < this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]
-                                  ["levels"][a]
-                                      .get<int>();
+           b <
+           (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
+                                        ["levels"][a]
+                                            .get<int>();
            b++) {
         float targetStarSize = 32;
         Sprite star{};
@@ -314,7 +318,8 @@ class StateWorld {
     auto bgActionPos = this->buttonAction.getPosition();
     Text textButtonAction{};
     auto textValue =
-        this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
+        (*this->data
+              ->getJsonBoats())["boats"][this->shopSelectedBoatIndex]["owned"]
             ? "USE"
             : "BUY";
     textButtonAction.setString(textValue);
@@ -381,33 +386,32 @@ class StateWorld {
     window.draw(text);
   }
 
-  void loadJsonData() {
-    string path = "data/boats.json";
-    string pathProfile = "data/profile.json";
+  // void loadJsonData() {
+  //   string path = "data/boats.json";
+  //   string pathProfile = "data/profile.json";
 
-    ifstream file(path), fileProfile(pathProfile);
-    this->jsonBoatsData = json::parse(file);
-    this->jsonProfile = json::parse(fileProfile);
-  }
+  //   ifstream file(path), fileProfile(pathProfile);
+  //   this->jsonBoatsData = json::parse(file);
+  //   this->jsonProfile = json::parse(fileProfile);
+  // }
 
-  void saveJsonData() {
-    string path = "data/boats.json";
-    ofstream file(path);
-    if (file << this->jsonBoatsData << endl) {
-      string pathProfile = "data/profile.json";
-      ofstream fileProfile(pathProfile);
-      if (fileProfile << this->jsonProfile << endl) {
-        this->loadJsonData();
-      }
-    }
-  }
+  // void saveJsonData() {
+  //   string path = "data/boats.json";
+  //   ofstream file(path);
+  //   if (file << this->jsonBoatsData << endl) {
+  //     string pathProfile = "data/profile.json";
+  //     ofstream fileProfile(pathProfile);
+  //     if (fileProfile << this->jsonProfile << endl) {
+  //       this->loadJsonData();
+  //     }
+  //   }
+  // }
 
  public:
-  StateWorld(string *state, RenderWindow *window) {
+  StateWorld(string *state, RenderWindow *window, Data *data) {
     this->state = state;
     this->window = window;
-
-    this->loadJsonData();
+    this->data = data;
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
@@ -471,22 +475,28 @@ class StateWorld {
       if (this->buttonAction.getGlobalBounds().contains(mx, my)) {
         cout << "button action clicked" << endl;
         bool isActionUse =
-            this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
-                .get<bool>();
+            (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
+                                         ["owned"]
+                                             .get<bool>();
 
         if (isActionUse) {
           // todo: change boat
-          this->jsonProfile["selectedBoat"] = (this->shopSelectedBoatIndex + 1);
+          (*this->data->getJsonProfile())["selectedBoat"] =
+              (this->shopSelectedBoatIndex + 1);
           this->isShopOpenned = false;
-          this->saveJsonData();
+          this->data->save();
+          this->data->load();
         } else {
           // todo: buy a new boat
           bool isOwned =
-              this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
-                  .get<bool>();
-          this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"] =
-              !isOwned;
-          this->saveJsonData();
+              (*this->data
+                    ->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
+                                     ["owned"]
+                                         .get<bool>();
+          (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
+                                       ["owned"] = !isOwned;
+          this->data->save();
+          this->data->load();
         }
       }
     }

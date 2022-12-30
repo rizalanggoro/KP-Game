@@ -22,12 +22,12 @@ class Asset {
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{},
       vectorDirt{};
 
-  vector<Texture> vectorBoatColor1{};
+  // vector<Texture> vectorBoatColor1{};
   vector<Texture> vectorBoatColor3{};
-  vector<Texture> vectorCannon1{};
-  vector<Texture> vectorCannon2{};
-  vector<Texture> vectorCannon3{};
-  vector<Texture> vectorCannon4{};
+  // vector<Texture> vectorCannon1{};
+  // vector<Texture> vectorCannon2{};
+  // vector<Texture> vectorCannon3{};
+  // vector<Texture> vectorCannon4{};
 
   vector<vector<Texture>> vectorBoats{};
 
@@ -89,7 +89,7 @@ class Asset {
     {
       string path = "assets/images/Boat 2 Set.png";
       vector<Texture> vectorTexture{};
-      for (int a = 0; a < 4; a++) {
+      for (int a = 0; a < 3; a++) {
         Texture texture{};
         texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
         vectorTexture.push_back(texture);
@@ -111,7 +111,7 @@ class Asset {
     {
       string path = "assets/images/Boat 4 Set.png";
       vector<Texture> vectorTexture{};
-      for (int a = 0; a < 4; a++) {
+      for (int a = 0; a < 3; a++) {
         Texture texture{};
         texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
         vectorTexture.push_back(texture);
@@ -288,18 +288,18 @@ class Asset {
 
   void loadBoat() {
     // todo: load boat color 1
-    for (int a = 1; a <= 4; a++) {
-      string path = "assets/images/Boats_color1/Boat_color1_";
-      path += to_string(a);
-      path += ".png";
+    // for (int a = 1; a <= 4; a++) {
+    //   string path = "assets/images/Boats_color1/Boat_color1_";
+    //   path += to_string(a);
+    //   path += ".png";
 
-      cout << path << endl;
+    //   cout << path << endl;
 
-      Texture texture{};
-      if (texture.loadFromFile(path))
-        cout << "boat color 1 / " << a << " loaded!" << endl;
-      this->vectorBoatColor1.push_back(texture);
-    }
+    //   Texture texture{};
+    //   if (texture.loadFromFile(path))
+    //     cout << "boat color 1 / " << a << " loaded!" << endl;
+    //   this->vectorBoatColor1.push_back(texture);
+    // }
 
     // todo: load boat color 3
     for (int a = 1; a <= 4; a++) {
@@ -317,26 +317,26 @@ class Asset {
   }
 
   void loadCannon() {
-    int count[] = {4, 3, 4, 3};
-    for (int a = 0; a < 4; a++) {
-      for (int b = 1; b <= count[a]; b++) {
-        string path = "assets/images/Cannon";
-        path += to_string(a + 1);
-        path += "_color1/Cannon";
-        path += to_string(a + 1);
-        path += "_color1_";
-        path += to_string(b);
-        path += ".png";
+    // int count[] = {4, 3, 4, 3};
+    // for (int a = 0; a < 4; a++) {
+    //   for (int b = 1; b <= count[a]; b++) {
+    //     string path = "assets/images/Cannon";
+    //     path += to_string(a + 1);
+    //     path += "_color1/Cannon";
+    //     path += to_string(a + 1);
+    //     path += "_color1_";
+    //     path += to_string(b);
+    //     path += ".png";
 
-        Texture texture{};
-        if (texture.loadFromFile(path)) cout << path << " loaded!" << endl;
+    //     Texture texture{};
+    //     if (texture.loadFromFile(path)) cout << path << " loaded!" << endl;
 
-        if (a == 0) this->vectorCannon1.push_back(texture);
-        if (a == 1) this->vectorCannon2.push_back(texture);
-        if (a == 2) this->vectorCannon3.push_back(texture);
-        if (a == 3) this->vectorCannon4.push_back(texture);
-      }
-    }
+    //     if (a == 0) this->vectorCannon1.push_back(texture);
+    //     if (a == 1) this->vectorCannon2.push_back(texture);
+    //     if (a == 2) this->vectorCannon3.push_back(texture);
+    //     if (a == 3) this->vectorCannon4.push_back(texture);
+    //   }
+    // }
   }
 
   void loadMapJson() {
@@ -387,12 +387,12 @@ class Asset {
   vector<vector<Texture>> *getVectorCharSpite() { return &vectorCharSpite; };
 
   vector<vector<Texture>> *getVectorBoats() { return &this->vectorBoats; }
-  vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
+  // vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
   vector<Texture> *getVectorBoatColor3() { return &this->vectorBoatColor3; }
-  vector<Texture> *getVectorCannon1() { return &this->vectorCannon1; }
-  vector<Texture> *getVectorCannon2() { return &this->vectorCannon2; }
-  vector<Texture> *getVectorCannon3() { return &this->vectorCannon3; }
-  vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
+  // vector<Texture> *getVectorCannon1() { return &this->vectorCannon1; }
+  // vector<Texture> *getVectorCannon2() { return &this->vectorCannon2; }
+  // vector<Texture> *getVectorCannon3() { return &this->vectorCannon3; }
+  // vector<Texture> *getVectorCannon4() { return &this->vectorCannon4; }
 
   vector<Texture> *getVectorGrassBiom() { return &this->vectorGrassBiom; }
   vector<Texture> *getVectorChest() { return &this->vectorChest; }
