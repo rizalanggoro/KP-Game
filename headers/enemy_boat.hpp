@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "fire.hpp"
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
 
@@ -19,7 +20,6 @@ class EnemyBoat {
 
   float boatSize = 128;
   float boatTargetSize = 80;
-  // float boatTargetSize = 256;
   float boatScaleFactor = 1;
   string boatDirection = "d";
 
@@ -32,11 +32,42 @@ class EnemyBoat {
   RectangleShape colliderBox{}, colliderFire{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
 
+  Clock clockFire;
+  float fireInterval = 0;
+  float fireDelay = 250;
+  float fireFrameIndex = 0;
+
+  vector<Fire> vectorFire{};
+
+  void fire(string dir) {
+    this->fireInterval = this->clockFire.getElapsedTime().asMilliseconds();
+
+    if (this->fireInterval >=
+        this->fireDelay / this->asset->getVectorBoats()->at(0).size()) {
+      if (this->fireFrameIndex <
+          this->asset->getVectorBoats()->at(0).size() - 1)
+        this->fireFrameIndex++;
+      else {
+        this->fireFrameIndex = 0;
+
+        auto playerPos = this->enemy.getPosition();
+        Fire newFire{this->asset, dir};
+        newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
+        newFire.setVelocity(this->enemyVelocity * 2);
+
+        this->vectorFire.push_back(newFire);
+      }
+
+      this->clockFire.restart();
+    }
+  }
+
  public:
   // todo: getters
   RectangleShape *getColliderFire() { return &this->colliderFire; }
   int getHp() { return this->hp; }
   void decreaseHp(int num) { this->hp -= num; }
+  vector<Fire> *getVectorFire() { return &this->vectorFire; }
 
   EnemyBoat(Asset *asset, TilemapWar *tilemap, PlayerBoat *playerBoat) {
     this->asset = asset;
@@ -54,7 +85,8 @@ class EnemyBoat {
   }
 
   void draw(RenderWindow &window) {
-    this->enemy.setTexture(this->asset->getVectorBoatColor3()->at(0));
+    this->enemy.setTexture(this->asset->getVectorBoats()->at(0).at(0));
+    this->enemy.setColor(Color(163, 91, 112, 255));
     this->enemy.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->enemy.setScale(this->boatScaleFactor, this->boatScaleFactor);
     window.draw(this->enemy);
@@ -118,46 +150,66 @@ class EnemyBoat {
     auto dx = playerPos.x - enemyPos.x;
     auto dy = playerPos.y - enemyPos.y;
 
+    // todo: enemy move
     if (enemyPos.x < playerPos.x &&
         this->tilemap->canMove(&this->colliderRight)) {
       // todo: move right
-      this->boatDirection = "r";
-      this->enemy.setRotation(270);
-      if (dx < this->enemyVelocity)
-        this->enemy.setPosition(playerPos.x, enemyPos.y);
-      else
-        this->enemy.move(this->enemyVelocity, 0);
-
+      if (this->playerBoat->getColliderLeftEnemy()
+              ->getGlobalBounds()
+              .intersects(this->colliderRight.getGlobalBounds())) {
+        this->fire("r");
+      } else {
+        this->boatDirection = "r";
+        this->enemy.setRotation(270);
+        if (dx < this->enemyVelocity)
+          this->enemy.setPosition(playerPos.x, enemyPos.y);
+        else
+          this->enemy.move(this->enemyVelocity, 0);
+      }
     } else if (enemyPos.x > playerPos.x &&
                this->tilemap->canMove(&this->colliderLeft)) {
       // todo: move left
-      this->boatDirection = "l";
-      this->enemy.setRotation(90);
-      if (dx > this->enemyVelocity)
-        this->enemy.setPosition(playerPos.x, enemyPos.y);
-      else
-        this->enemy.move(-this->enemyVelocity, 0);
-
-    }
-
-    else if (enemyPos.y < playerPos.y &&
-             this->tilemap->canMove(&this->colliderDown)) {
+      if (this->playerBoat->getColliderRightEnemy()
+              ->getGlobalBounds()
+              .intersects(this->colliderLeft.getGlobalBounds())) {
+        this->fire("l");
+      } else {
+        this->boatDirection = "l";
+        this->enemy.setRotation(90);
+        if (dx > this->enemyVelocity)
+          this->enemy.setPosition(playerPos.x, enemyPos.y);
+        else
+          this->enemy.move(-this->enemyVelocity, 0);
+      }
+    } else if (enemyPos.y < playerPos.y &&
+               this->tilemap->canMove(&this->colliderDown)) {
       // todo: move down
-      this->boatDirection = "d";
-      this->enemy.setRotation(0);
-      if (dy < this->enemyVelocity)
-        this->enemy.setPosition(enemyPos.x, playerPos.y);
-      else
-        this->enemy.move(0, this->enemyVelocity);
+      if (this->playerBoat->getColliderUpEnemy()->getGlobalBounds().intersects(
+              this->colliderDown.getGlobalBounds())) {
+        this->fire("d");
+      } else {
+        this->boatDirection = "d";
+        this->enemy.setRotation(0);
+        if (dy < this->enemyVelocity)
+          this->enemy.setPosition(enemyPos.x, playerPos.y);
+        else
+          this->enemy.move(0, this->enemyVelocity);
+      }
     } else if (enemyPos.y > playerPos.y &&
                this->tilemap->canMove(&this->colliderUp)) {
       // todo: move up
-      this->boatDirection = "u";
-      this->enemy.setRotation(180);
-      if (dy > this->enemyVelocity)
-        this->enemy.setPosition(enemyPos.x, playerPos.y);
-      else
-        this->enemy.move(0, -this->enemyVelocity);
+      if (this->playerBoat->getColliderDownEnemy()
+              ->getGlobalBounds()
+              .intersects(this->colliderUp.getGlobalBounds())) {
+        this->fire("u");
+      } else {
+        this->boatDirection = "u";
+        this->enemy.setRotation(180);
+        if (dy > this->enemyVelocity)
+          this->enemy.setPosition(enemyPos.x, playerPos.y);
+        else
+          this->enemy.move(0, -this->enemyVelocity);
+      }
     }
 
     // todo: draw collider fire
@@ -179,6 +231,18 @@ class EnemyBoat {
     this->colliderFire.setSize(Vector2f(colliderFireX, colliderFireY));
     this->colliderFire.setPosition(colliderFirePosX, colliderFirePoxY);
     window.draw(this->colliderFire);
+
+    // todo: draw fire
+    for (int a = 0; a < this->vectorFire.size(); a++) {
+      Fire *fire = &this->vectorFire.at(a);
+      fire->draw(window);
+
+      if (this->tilemap->isFireCollided(fire->getFireCollider()))
+        this->vectorFire.erase(this->vectorFire.begin() + a);
+
+      if (this->tilemap->isFireCollidedMap(fire->getFireCollider()))
+        this->vectorFire.erase(this->vectorFire.begin() + a);
+    }
   }
 };
 

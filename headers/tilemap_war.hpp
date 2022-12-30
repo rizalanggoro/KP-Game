@@ -22,8 +22,9 @@ class TilemapWar {
   float tileTargetSize = 32;
   float tileScaleFactor = 0;
 
-  vector<int> vectorTilelayerGrass{}, vectorTilelayerCollision{};
-  vector<RectangleShape> vectorCollision{};
+  vector<int> vectorTilelayerGrass{}, vectorTilelayerCollision{},
+      vectorTilelayerCollisionMap;
+  vector<RectangleShape> vectorCollision{}, vectorCollisionMap{};
 
   int width;
   int height;
@@ -53,25 +54,52 @@ class TilemapWar {
         auto data = layer["data"].get<vector<int>>();
         if (layerName == "grass") this->vectorTilelayerGrass = data;
         if (layerName == "collision") this->vectorTilelayerCollision = data;
+        if (layerName == "collision map")
+          this->vectorTilelayerCollisionMap = data;
       }
     }
   }
 
   void loadCollision() {
-    int index = 0;
-    for (int h = 0; h < this->height; h++) {
-      for (int w = 0; w < this->width; w++) {
-        int type = this->vectorTilelayerCollision.at(index);
-        if (type != 0) {
-          RectangleShape rect{};
-          rect.setFillColor(Color(255, 0, 0, 50));
-          rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
-          rect.setPosition(w * this->tileTargetSize, h * this->tileTargetSize);
+    // todo: load collision player and bot
+    {
+      int index = 0;
+      for (int h = 0; h < this->height; h++) {
+        for (int w = 0; w < this->width; w++) {
+          int type = this->vectorTilelayerCollision.at(index);
+          if (type != 0) {
+            RectangleShape rect{};
+            rect.setFillColor(Color(255, 0, 0, 50));
+            rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
+            rect.setPosition(w * this->tileTargetSize,
+                             h * this->tileTargetSize);
 
-          this->vectorCollision.push_back(rect);
+            this->vectorCollision.push_back(rect);
+          }
+
+          index++;
         }
+      }
+    }
 
-        index++;
+    // todo: load collision player and map
+    {
+      int index = 0;
+      for (int h = 0; h < this->height; h++) {
+        for (int w = 0; w < this->width; w++) {
+          int type = this->vectorTilelayerCollisionMap.at(index);
+          if (type != 0) {
+            RectangleShape rect{};
+            rect.setFillColor(Color(255, 0, 0, 50));
+            rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
+            rect.setPosition(w * this->tileTargetSize,
+                             h * this->tileTargetSize);
+
+            this->vectorCollisionMap.push_back(rect);
+          }
+
+          index++;
+        }
       }
     }
   }
@@ -143,6 +171,11 @@ class TilemapWar {
     for (int a = 0; a < this->vectorCollision.size(); a++) {
       window.draw(this->vectorCollision.at(a));
     }
+
+    // todo: draw collision map
+    for (int a = 0; a < this->vectorCollisionMap.size(); a++) {
+      window.draw(this->vectorCollisionMap.at(a));
+    }
   }
 
   bool canMove(RectangleShape *rect) {
@@ -154,8 +187,25 @@ class TilemapWar {
     return count == 0;
   }
 
+  bool canMoveMap(RectangleShape *rect) {
+    int count = 0;
+    for (auto collider : this->vectorCollisionMap) {
+      if (rect->getGlobalBounds().intersects(collider.getGlobalBounds()))
+        count++;
+    }
+    return count == 0;
+  }
+
   bool isFireCollided(CircleShape *circle) {
     for (auto collider : this->vectorCollision) {
+      if (circle->getGlobalBounds().intersects(collider.getGlobalBounds()))
+        return true;
+    }
+    return false;
+  }
+
+  bool isFireCollidedMap(CircleShape *circle) {
+    for (auto collider : this->vectorCollisionMap) {
       if (circle->getGlobalBounds().intersects(collider.getGlobalBounds()))
         return true;
     }

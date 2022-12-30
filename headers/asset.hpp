@@ -44,6 +44,7 @@ class Asset {
   Texture textureFire{};
   Texture textureStar{};
   Texture textureBigButton{};
+  Texture textureBackgroundPhoto{};
   // Texture textureDialogBox{};
 
   void loadFont() {
@@ -145,6 +146,7 @@ class Asset {
     this->textureStar.loadFromFile("assets/images/Star.png");
     this->textureButtonPlus.loadFromFile("assets/images/Button Plus.png");
     this->textureBigButton.loadFromFile("assets/images/UI Big Play Button.png");
+    this->textureBackgroundPhoto.loadFromFile("assets/images/Bg Photo.png");
   }
 
   void loadTextureChest() {
@@ -404,6 +406,7 @@ class Asset {
   Texture *getTextureButtonPlus() { return &this->textureButtonPlus; }
   Texture *getTextureBigButton() { return &this->textureBigButton; }
   Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
+  Texture *getTextureBackgroundPhoto() { return &this->textureBackgroundPhoto; }
 
   vector<Texture> *getVectorSquareButtons() {
     return &this->vectorSquareButtons;

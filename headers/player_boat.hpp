@@ -16,26 +16,23 @@ class PlayerBoat {
  private:
   Asset *asset;
   TilemapWar *tilemap;
+
   Sprite player{};
-  // Sprite playerCannon{};
   vector<Fire> vectorFire{};
 
-  string playerDirection = "d";
+  string playerDirection = "r";
   int boatLevel = 1;
 
   float boatSize = 128;
   float boatTargetSize = 80;
-  // float boatTargetSize = 256;
   float boatScaleFactor = 1;
-
-  // float boatCannonSize = 0;
-  // float boatCannonTargetSize = 1;
-  // float boatCannonScaleFactor = 1;
 
   float velocity = 5;
 
-  RectangleShape colliderBox{};
+  RectangleShape colliderBox{}, colliderBoxEnemy{}, colliderBoxFire{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
+  RectangleShape colliderUpEnemy{}, colliderDownEnemy{}, colliderRightEnemy{},
+      colliderLeftEnemy{};
 
   Clock clockFrameCannon{};
   float frameCannonDelay = 250;
@@ -59,32 +56,25 @@ class PlayerBoat {
   }
 
  public:
+  RectangleShape *getColliderBoxFire() { return &this->colliderBoxFire; }
+  RectangleShape *getColliderUpEnemy() { return &this->colliderUpEnemy; }
+  RectangleShape *getColliderDownEnemy() { return &this->colliderDownEnemy; }
+  RectangleShape *getColliderRightEnemy() { return &this->colliderRightEnemy; }
+  RectangleShape *getColliderLeftEnemy() { return &this->colliderLeftEnemy; }
+
   float getVelocity() { return this->velocity; }
   void setVelocity(float velocity) { this->velocity = velocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
   Sprite *getSprite() { return &this->player; }
+
   RectangleShape *getColliderBox() { return &this->colliderBox; };
   RectangleShape *getColliderUp() { return &this->colliderUp; }
   RectangleShape *getColliderDown() { return &this->colliderDown; }
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
+
   int getCurrentBoatIndex() { return this->currentBoatIndex; }
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
-
-  // void nextBoat() {
-  //   if (this->currentBoatIndex < this->asset->getVectorBoatColor1()->size() -
-  //   1)
-  //     this->currentBoatIndex++;
-  //   else
-  //     this->currentBoatIndex = 0;
-  // }
-  // void previousBoat() {
-  //   if (this->currentBoatIndex > 0)
-  //     this->currentBoatIndex--;
-  //   else
-  //     this->currentBoatIndex = this->asset->getVectorBoatColor1()->size() -
-  //     1;
-  // }
 
   void moveUpRight() {
     this->playerDirection = "ur";
@@ -129,24 +119,25 @@ class PlayerBoat {
     this->frameCannonInterval =
         this->clockFrameCannon.getElapsedTime().asMilliseconds();
 
-    // if (this->frameCannonInterval >=
-    //     this->frameCannonDelay / this->asset->getVectorCannon4()->size()) {
-    //   if (this->currFrameCannonIndex <
-    //       this->asset->getVectorCannon4()->size() - 1)
-    //     this->currFrameCannonIndex++;
-    //   else {
-    //     this->currFrameCannonIndex = 0;
+    if (this->frameCannonInterval >=
+        this->frameCannonDelay /
+            this->asset->getVectorBoats()->at(this->boatLevel - 1).size()) {
+      if (this->currFrameCannonIndex <
+          this->asset->getVectorBoats()->at(this->boatLevel - 1).size() - 1)
+        this->currFrameCannonIndex++;
+      else {
+        this->currFrameCannonIndex = 0;
 
-    //     auto playerPos = this->player.getPosition();
-    //     Fire newFire{this->asset, this->playerDirection};
-    //     newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
-    //     newFire.setVelocity(this->velocity * 2);
+        auto playerPos = this->player.getPosition();
+        Fire newFire{this->asset, this->playerDirection};
+        newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
+        newFire.setVelocity(this->velocity * 2);
 
-    //     this->vectorFire.push_back(newFire);
-    //   }
+        this->vectorFire.push_back(newFire);
+      }
 
-    //   this->clockFrameCannon.restart();
-    // }
+      this->clockFrameCannon.restart();
+    }
   }
 
   PlayerBoat(Asset *asset, TilemapWar *tilemap) {
@@ -154,11 +145,6 @@ class PlayerBoat {
     this->tilemap = tilemap;
 
     this->boatScaleFactor = this->boatTargetSize / this->boatSize;
-
-    this->player.setPosition(
-        25 * this->tilemap->getTileTargetSize() - this->boatTargetSize / 2,
-        this->tilemap->getHeight() * this->tilemap->getTileTargetSize() / 2 -
-            this->boatTargetSize / 2);
 
     // this->boatCannonTargetSize = this->boatTargetSize / 2;
     // this->playerCannon.setTexture(this->asset->getVectorCannon4()->at(0));
@@ -171,8 +157,9 @@ class PlayerBoat {
 
   void draw(RenderWindow &window) {
     // todo: draw boat
-    this->player.setTexture(
-        this->asset->getVectorBoats()->at(this->boatLevel - 1).at(0));
+    this->player.setTexture(this->asset->getVectorBoats()
+                                ->at(this->boatLevel - 1)
+                                .at(this->currFrameCannonIndex));
     this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->player.setRotation(this->parseDirection(this->playerDirection));
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
@@ -232,12 +219,83 @@ class PlayerBoat {
     window.draw(this->colliderRight);
     window.draw(this->colliderLeft);
 
+    // todo: draw collider box enemy
+    this->colliderBoxEnemy.setFillColor(Color::Transparent);
+    this->colliderBoxEnemy.setPosition(playerPos.x - this->boatTargetSize * 2,
+                                       playerPos.y - this->boatTargetSize * 2);
+    this->colliderBoxEnemy.setOutlineThickness(-2);
+    this->colliderBoxEnemy.setOutlineColor(Color(255, 0, 0, 50));
+    this->colliderBoxEnemy.setSize(
+        Vector2f(this->boatTargetSize * 4, this->boatTargetSize * 4));
+
+    window.draw(this->colliderBoxEnemy);
+
+    // todo: draw collider enemy
+    auto hColliderEnemySize =
+        Vector2f(this->boatTargetSize * 4, this->boatTargetSize * 2);
+    auto vColliderEnemySize =
+        Vector2f(this->boatTargetSize * 2, this->boatTargetSize * 4);
+
+    this->colliderUpEnemy.setSize(hColliderEnemySize);
+    this->colliderDownEnemy.setSize(hColliderEnemySize);
+    this->colliderRightEnemy.setSize(vColliderEnemySize);
+    this->colliderLeftEnemy.setSize(vColliderEnemySize);
+
+    auto colliderEnemyColor = Color(0, 0, 255, 50);
+    this->colliderUpEnemy.setFillColor(colliderEnemyColor);
+    this->colliderDownEnemy.setFillColor(colliderEnemyColor);
+    this->colliderRightEnemy.setFillColor(colliderEnemyColor);
+    this->colliderLeftEnemy.setFillColor(colliderEnemyColor);
+
+    auto colliderBoxEnemyPos = this->colliderBoxEnemy.getPosition();
+    this->colliderUpEnemy.setPosition(Vector2f(
+        colliderBoxEnemyPos.x, colliderBoxEnemyPos.y - this->velocity * 2));
+    this->colliderDownEnemy.setPosition(Vector2f(
+        colliderBoxEnemyPos.x,
+        colliderBoxEnemyPos.y + this->boatTargetSize * 2 + this->velocity * 2));
+    this->colliderRightEnemy.setPosition(Vector2f(
+        colliderBoxEnemyPos.x + this->boatTargetSize * 2 + this->velocity * 2,
+        colliderBoxEnemyPos.y));
+    this->colliderLeftEnemy.setPosition(Vector2f(
+        colliderBoxEnemyPos.x - this->velocity * 2, colliderBoxEnemyPos.y));
+
+    window.draw(this->colliderUpEnemy);
+    window.draw(this->colliderDownEnemy);
+    window.draw(this->colliderRightEnemy);
+    window.draw(this->colliderLeftEnemy);
+
+    // todo: draw collider box fire
+    this->colliderBoxFire.setFillColor(Color::Transparent);
+    this->colliderBoxFire.setOutlineThickness(-2);
+    this->colliderBoxFire.setOutlineColor(Color(0, 255, 0, 255));
+    if (this->playerDirection == "u" || this->playerDirection == "d") {
+      this->colliderBoxFire.setSize(
+          Vector2f(this->boatTargetSize / 2, this->boatTargetSize));
+      this->colliderBoxFire.setPosition(playerPos.x - this->boatTargetSize / 4,
+                                        playerPos.y - this->boatTargetSize / 2);
+    } else if (this->playerDirection == "r" || this->playerDirection == "l") {
+      this->colliderBoxFire.setSize(
+          Vector2f(this->boatTargetSize, this->boatTargetSize / 2));
+      this->colliderBoxFire.setPosition(playerPos.x - this->boatTargetSize / 2,
+                                        playerPos.y - this->boatTargetSize / 4);
+    } else {
+      this->colliderBoxFire.setSize(
+          Vector2f(this->boatTargetSize, this->boatTargetSize));
+      this->colliderBoxFire.setPosition(playerPos.x - this->boatTargetSize / 2,
+                                        playerPos.y - this->boatTargetSize / 2);
+    }
+
+    window.draw(this->colliderBoxFire);
+
     // todo: draw fire
     for (int a = 0; a < this->vectorFire.size(); a++) {
       Fire *fire = &this->vectorFire.at(a);
       fire->draw(window);
 
       if (this->tilemap->isFireCollided(fire->getFireCollider()))
+        this->vectorFire.erase(this->vectorFire.begin() + a);
+
+      if (this->tilemap->isFireCollidedMap(fire->getFireCollider()))
         this->vectorFire.erase(this->vectorFire.begin() + a);
     }
   }
