@@ -312,7 +312,7 @@ class StateWar {
         EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
                                &this->playerBoat};
         int randomPos[5][2] = {
-            {40, 0}, {0, 30}, {20, 53}, {50, 53}, {73, 35},
+            {6, 29}, {20, 53}, {50, 53}, {73, 35}, {40, 6},
         };
         int randomPosIndex = rand() % 5;
         newEnemyBoat.setInitPos(randomPos[randomPosIndex][0],
