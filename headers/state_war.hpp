@@ -29,7 +29,7 @@ class StateWar {
   float spawnEnemyBoatInterval = 0;
   float spawnEnemyBoatDelay = 2000;
 
-  float colliderMapSize = 32;
+  float colliderMapSize = 128;
   Vector2i playerRealPos;
 
   void handleKeyboard() {
@@ -46,10 +46,10 @@ class StateWar {
     bool canMoveLeft =
         this->tilemapWar.canMove(this->playerBoat.getColliderLeft());
 
-    auto mapMaxY =
-        this->window->getSize().y - this->playerBoat.getBoatTargetSize() - 32;
-    auto mapMaxX =
-        this->window->getSize().x - this->playerBoat.getBoatTargetSize() - 32;
+    auto mapMaxY = this->window->getSize().y -
+                   this->playerBoat.getBoatTargetSize() - this->colliderMapSize;
+    auto mapMaxX = this->window->getSize().x -
+                   this->playerBoat.getBoatTargetSize() - this->colliderMapSize;
     auto mapMin = this->colliderMapSize;
 
     if (keyUp && keyRight) {

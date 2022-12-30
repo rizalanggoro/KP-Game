@@ -29,6 +29,8 @@ class Asset {
   vector<Texture> vectorCannon3{};
   vector<Texture> vectorCannon4{};
 
+  vector<vector<Texture>> vectorBoats{};
+
   vector<vector<Texture>> vectorCharSpite{};
 
   vector<Texture> vectorSquareButtons{};
@@ -41,6 +43,7 @@ class Asset {
   Texture textureButtonPlus{};
   Texture textureFire{};
   Texture textureStar{};
+  Texture textureBigButton{};
   // Texture textureDialogBox{};
 
   void loadFont() {
@@ -67,6 +70,54 @@ class Asset {
     this->loadTextureSquareButtons();
     this->loadTextureSettingMenu();
     // this->loadTextureDialogBox();
+    this->loadTextureBoats();
+  }
+
+  void loadTextureBoats() {
+    // todo: load boat 1
+    {
+      string path = "assets/images/Boat 1 Set.png";
+      vector<Texture> vectorTexture{};
+      for (int a = 0; a < 4; a++) {
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
+        vectorTexture.push_back(texture);
+      }
+      this->vectorBoats.push_back(vectorTexture);
+    }
+    // todo: load boat 2
+    {
+      string path = "assets/images/Boat 2 Set.png";
+      vector<Texture> vectorTexture{};
+      for (int a = 0; a < 4; a++) {
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
+        vectorTexture.push_back(texture);
+      }
+      this->vectorBoats.push_back(vectorTexture);
+    }
+    // todo: load boat 3
+    {
+      string path = "assets/images/Boat 3 Set.png";
+      vector<Texture> vectorTexture{};
+      for (int a = 0; a < 4; a++) {
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
+        vectorTexture.push_back(texture);
+      }
+      this->vectorBoats.push_back(vectorTexture);
+    }
+    // todo: load boat 4
+    {
+      string path = "assets/images/Boat 4 Set.png";
+      vector<Texture> vectorTexture{};
+      for (int a = 0; a < 4; a++) {
+        Texture texture{};
+        texture.loadFromFile(path, IntRect(a * 128, 0, 128, 128));
+        vectorTexture.push_back(texture);
+      }
+      this->vectorBoats.push_back(vectorTexture);
+    }
   }
 
   void loadTextureHome() {
@@ -93,6 +144,7 @@ class Asset {
     this->textureButtonClose.loadFromFile("assets/images/Button close.png");
     this->textureStar.loadFromFile("assets/images/Star.png");
     this->textureButtonPlus.loadFromFile("assets/images/Button Plus.png");
+    this->textureBigButton.loadFromFile("assets/images/UI Big Play Button.png");
   }
 
   void loadTextureChest() {
@@ -334,6 +386,7 @@ class Asset {
   vector<Texture> *getVectorDirt() { return &vectorDirt; };
   vector<vector<Texture>> *getVectorCharSpite() { return &vectorCharSpite; };
 
+  vector<vector<Texture>> *getVectorBoats() { return &this->vectorBoats; }
   vector<Texture> *getVectorBoatColor1() { return &this->vectorBoatColor1; }
   vector<Texture> *getVectorBoatColor3() { return &this->vectorBoatColor3; }
   vector<Texture> *getVectorCannon1() { return &this->vectorCannon1; }
@@ -349,6 +402,7 @@ class Asset {
   Texture *getTextureStar() { return &this->textureStar; }
   Texture *getTextureButtonClose() { return &this->textureButtonClose; }
   Texture *getTextureButtonPlus() { return &this->textureButtonPlus; }
+  Texture *getTextureBigButton() { return &this->textureBigButton; }
   Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
 
   vector<Texture> *getVectorSquareButtons() {

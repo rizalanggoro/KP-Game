@@ -22,6 +22,7 @@ class StateWorld {
   RenderWindow *window;
 
   json jsonBoatsData;
+  json jsonProfile;
 
   Asset asset{"world"};
   Player player{&asset};
@@ -35,9 +36,9 @@ class StateWorld {
   bool isInWarPoint = false;
   bool isInShopPoint = false;
   bool isPaused = false;
-  bool isShopOpenned = false;
+  bool isShopOpenned = true;
 
-  Sprite buttonClose{};
+  Sprite buttonClose{}, buttonAction{};
   Sprite buttonBoat1{}, buttonBoat2{}, buttonBoat3{}, buttonBoat4{};
   int shopSelectedBoatIndex = 0;
 
@@ -190,6 +191,7 @@ class StateWorld {
     buttonClose.setScale(64 / 20, 64 / 20);
     window.draw(buttonClose);
 
+    // todo: draw title
     Text title{};
     title.setString("UPGRADE");
     title.setFont(*this->asset.getFont());
@@ -229,20 +231,26 @@ class StateWorld {
       auto boatScaleFactor = (bgBoatSize - 32) / 128;
 
       Sprite boat{};
-      boat.setTexture(this->asset.getVectorBoatColor1()->at(a));
+      boat.setTexture(this->asset.getVectorBoats()->at(a).at(0));
       boat.setScale(boatScaleFactor, boatScaleFactor);
       auto boatBounds = boat.getGlobalBounds();
       boat.setPosition(bgBoatPos.x + (bgBoatSize - boatBounds.width) / 2,
                        bgBoatPos.y + (bgBoatSize - boatBounds.height) / 2);
-      if (!this->jsonBoatsData["boats"][a]["owned"].get<bool>())
-        boat.setColor(Color::Black);
+
+      bool isOwned = this->jsonBoatsData["boats"][a]["owned"].get<bool>();
+      if (!isOwned) boat.setColor(Color::Black);
       window.draw(boat);
 
       // todo: draw price
       auto boatPos = boat.getPosition();
       Text price{};
       price.setFont(*this->asset.getFont());
-      price.setString("$" + to_string(prices[a]));
+      if (!isOwned)
+        price.setString("$" + to_string(prices[a]));
+      else {
+        if (this->jsonProfile["selectedBoat"] == (a + 1))
+          price.setString("Used");
+      }
       price.setCharacterSize(16);
 
       auto priceBounds = price.getGlobalBounds();
@@ -254,8 +262,9 @@ class StateWorld {
       if (a == 3) _bgBoatPos = buttonBoat->getPosition();
     }
 
+    // todo: draw items
     string items[] = {"Damage", "Boat Speed", "Bullet Speed", "Life"};
-    // string itemKeys[] = {"damage", "boatV", "bulletV", "life"};
+    Vector2f lastItemPos;
     for (int a = 0; a < 4; a++) {
       Text text{};
       text.setFont(*this->asset.getFont());
@@ -283,21 +292,43 @@ class StateWorld {
         window.draw(star);
       }
 
-      // // todo: draw button upgrade
-      // float buttoUpgradeTargetSize = 64;
-      // Sprite *buttonUp;
-      // if (a == 0) buttonUp = &this->buttonUpDamage;
-      // if (a == 1) buttonUp = &this->buttonUpBoatVelocity;
-      // if (a == 2) buttonUp = &this->buttonUpBulletVelocity;
-      // if (a == 3) buttonUp = &this->buttonUpLife;
-      // buttonUp->setTexture(*this->asset.getTextureButtonPlus());
-      // buttonUp->setPosition(bgPos.x + bgSize.width - (64 + 48), textPos.y);
-      // buttonUp->setScale(buttoUpgradeTargetSize / 24,
-      //                    buttoUpgradeTargetSize / 24);
-      // window.draw(*buttonUp);
+      if (a == 3) lastItemPos = text.getPosition();
 
       window.draw(text);
     }
+
+    // todo: draw button actions
+    float buttonActionTargetHeight = 72;
+    this->buttonAction.setTexture(*this->asset.getTextureBigButton());
+    this->buttonAction.setScale(buttonActionTargetHeight / 27,
+                                buttonActionTargetHeight / 27);
+
+    auto buttonActionBounds = this->buttonAction.getGlobalBounds();
+    this->buttonAction.setPosition(
+        bgPos.x + (bgSize.width - buttonActionBounds.width) / 2,
+        bgPos.y + bgSize.height - (buttonActionTargetHeight * 3 / 5));
+
+    window.draw(this->buttonAction);
+
+    // todo: draw button action text
+    auto bgActionPos = this->buttonAction.getPosition();
+    Text textButtonAction{};
+    auto textValue =
+        this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
+            ? "USE"
+            : "BUY";
+    textButtonAction.setString(textValue);
+    textButtonAction.setFillColor(Color(182, 137, 98, 255));
+    textButtonAction.setFont(*this->asset.getFont());
+    textButtonAction.setCharacterSize(20);
+
+    auto textButtonActionBounds = textButtonAction.getGlobalBounds();
+    textButtonAction.setPosition(
+        bgActionPos.x +
+            (buttonActionBounds.width - textButtonActionBounds.width) / 2,
+        bgActionPos.y - 4 +
+            (buttonActionBounds.height - textButtonActionBounds.height) / 2);
+    window.draw(textButtonAction);
   }
 
   void drawPauseMenu(RenderWindow &window) {
@@ -350,20 +381,25 @@ class StateWorld {
     window.draw(text);
   }
 
-  void loadJsonBoatsData() {
+  void loadJsonData() {
     string path = "data/boats.json";
+    string pathProfile = "data/profile.json";
 
-    ifstream file(path);
+    ifstream file(path), fileProfile(pathProfile);
     this->jsonBoatsData = json::parse(file);
+    this->jsonProfile = json::parse(fileProfile);
   }
 
   void saveJsonData() {
-    // string path = "data/save.json";
-
-    // ofstream file(path);
-    // if (file << this->jsonData) {
-    //   // this->loadJsonData();
-    // }
+    string path = "data/boats.json";
+    ofstream file(path);
+    if (file << this->jsonBoatsData << endl) {
+      string pathProfile = "data/profile.json";
+      ofstream fileProfile(pathProfile);
+      if (fileProfile << this->jsonProfile << endl) {
+        this->loadJsonData();
+      }
+    }
   }
 
  public:
@@ -371,7 +407,7 @@ class StateWorld {
     this->state = state;
     this->window = window;
 
-    this->loadJsonBoatsData();
+    this->loadJsonData();
 
     view = window->getDefaultView();
     view.setCenter(0, 0);
@@ -422,30 +458,6 @@ class StateWorld {
       if (this->buttonClose.getGlobalBounds().contains(mx, my)) {
         this->isShopOpenned = false;
       }
-      // if (this->buttonUpDamage.getGlobalBounds().contains(mx, my)) {
-      //   int level =
-      //       this->jsonData["boats"][this->shopSelectedBoatIndex]["damage"]
-      //           .get<int>();
-
-      //   if (event.mouseButton.button == Mouse::Left) {
-      //     cout << "left clicked!" << endl;
-      //     level++;
-      //   } else {
-      //     cout << "right clicked!" << endl;
-      //     level--;
-      //   }
-      //   this->jsonData["boats"][this->shopSelectedBoatIndex]["damage"] =
-      //   level; this->saveJsonData();
-      // }
-      // if (this->buttonUpBoatVelocity.getGlobalBounds().contains(mx, my)) {
-      //   cout << "up boat v called" << endl;
-      // }
-      // if (this->buttonUpBulletVelocity.getGlobalBounds().contains(mx, my)) {
-      //   cout << "up bullet v called" << endl;
-      // }
-      // if (this->buttonUpLife.getGlobalBounds().contains(mx, my)) {
-      //   cout << "up life called" << endl;
-      // }
 
       if (this->buttonBoat1.getGlobalBounds().contains(mx, my))
         this->shopSelectedBoatIndex = 0;
@@ -455,6 +467,28 @@ class StateWorld {
         this->shopSelectedBoatIndex = 2;
       if (this->buttonBoat4.getGlobalBounds().contains(mx, my))
         this->shopSelectedBoatIndex = 3;
+
+      if (this->buttonAction.getGlobalBounds().contains(mx, my)) {
+        cout << "button action clicked" << endl;
+        bool isActionUse =
+            this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
+                .get<bool>();
+
+        if (isActionUse) {
+          // todo: change boat
+          this->jsonProfile["selectedBoat"] = (this->shopSelectedBoatIndex + 1);
+          this->isShopOpenned = false;
+          this->saveJsonData();
+        } else {
+          // todo: buy a new boat
+          bool isOwned =
+              this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"]
+                  .get<bool>();
+          this->jsonBoatsData["boats"][this->shopSelectedBoatIndex]["owned"] =
+              !isOwned;
+          this->saveJsonData();
+        }
+      }
     }
   }
 

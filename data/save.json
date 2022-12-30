@@ -1,8 +1,0 @@
-{
-  "boats": [
-    { "boatV": 1, "bulletV": 3, "damage": 4, "life": 1, "owned": true },
-    { "boatV": 1, "bulletV": 1, "damage": 1, "life": 1, "owned": true },
-    { "boatV": 3, "bulletV": 1, "damage": 1, "life": 1, "owned": false },
-    { "boatV": 1, "bulletV": 1, "damage": 1, "life": 1, "owned": false }
-  ]
-}
