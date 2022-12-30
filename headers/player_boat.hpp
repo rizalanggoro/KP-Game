@@ -60,6 +60,7 @@ class PlayerBoat {
 
  public:
   float getVelocity() { return this->velocity; }
+  void setVelocity(float velocity) { this->velocity = velocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
   Sprite *getSprite() { return &this->player; }
   RectangleShape *getColliderBox() { return &this->colliderBox; };

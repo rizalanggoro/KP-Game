@@ -22,6 +22,9 @@ class StateWar {
   RenderWindow *window;
   Data *data;
 
+  int boatLevel = 1;
+  float boatVelocity = 0;
+
   Asset asset{"war"};
   View view{};
 
@@ -203,8 +206,14 @@ class StateWar {
     //   this->loadJsonData();
     // }
 
-    this->playerBoat.setLevel(
-        (*this->data->getJsonProfile())["selectedBoat"].get<int>());
+    this->boatLevel =
+        (*this->data->getJsonProfile())["selectedBoat"].get<int>();
+    this->boatVelocity =
+        (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][1]
+            .get<float>();
+
+    this->playerBoat.setLevel(this->boatLevel);
+    this->playerBoat.setVelocity(this->boatVelocity);
 
     // todo: spawn enemy boat
     this->spawnEnemyBoatInterval =
