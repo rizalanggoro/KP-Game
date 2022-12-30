@@ -308,7 +308,7 @@ class StateWar {
     this->spawnEnemyBoatInterval =
         this->clockEnemyBoat.getElapsedTime().asMilliseconds();
     if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
-      if (this->vectorEnemyBoat.size() <= 2) {
+      if (this->vectorEnemyBoat.size() <= 9) {
         EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
                                &this->playerBoat};
         int randomPos[5][2] = {
