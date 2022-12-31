@@ -181,29 +181,21 @@ class StateWar {
     else if (keyUp) {
       if (canMoveUp && canMoveMapUp) {
         this->moveMap(DIR_UP);
-        // if (this->playerRealPos.y <= mapMin)
-        //   this->view.move(0, -this->playerBoat.getVelocity());
         this->playerBoat.moveUp();
       }
     } else if (keyDown) {
       if (canMoveDown && canMoveMapDown) {
         this->moveMap(DIR_DOWN);
-        // if (this->playerRealPos.y >= mapMaxY)
-        //   this->view.move(0, this->playerBoat.getVelocity());
         this->playerBoat.moveDown();
       }
     } else if (keyRight) {
       if (canMoveRight && canMoveMapRight) {
         this->moveMap(DIR_RIGHT);
-        // if (this->playerRealPos.x >= mapMaxX)
-        //   this->view.move(this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveRight();
       }
     } else if (keyLeft) {
       if (canMoveLeft && canMoveMapLeft) {
         this->moveMap(DIR_LEFT);
-        // if (this->playerRealPos.x <= mapMin)
-        //   this->view.move(-this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveLeft();
       }
     }
@@ -213,7 +205,44 @@ class StateWar {
     }
   }
 
-  void drawGui(RenderWindow &window) { this->drawGuiBoatStats(window); }
+  void drawGui(RenderWindow &window) {
+    this->drawGuiBoatStats(window);
+    if (this->isGameOver) this->drawGuiGameOver(window);
+  }
+
+  void drawGuiGameOver(RenderWindow &window) {
+    auto wCenter = window.getView().getCenter();
+    auto wSize = window.getSize();
+
+    RectangleShape darkBg{};
+    darkBg.setFillColor(Color(0, 0, 0, 150));
+    darkBg.setSize(Vector2f(wSize.x, wSize.y));
+    window.draw(darkBg);
+
+    // todo: draw text title
+    Text title{};
+    title.setString("GAME OVER!");
+    title.setFont(*this->asset.getFont());
+    title.setCharacterSize(48);
+    title.setStyle(Text::Bold);
+
+    auto titleBounds = title.getGlobalBounds();
+    title.setPosition(wCenter.x - titleBounds.width / 2,
+                      wCenter.y - titleBounds.height / 2);
+
+    window.draw(title);
+
+    // todo: draw total point
+    Text totalPoint{};
+    totalPoint.setFont(*this->asset.getFont());
+    totalPoint.setString("Total points: 0");
+    totalPoint.setCharacterSize(24);
+
+    auto titlePos = title.getPosition();
+    totalPoint.setPosition(titlePos.x, titlePos.y + titleBounds.height);
+
+    window.draw(totalPoint);
+  }
 
   void drawGuiBoatStats(RenderWindow &window) {
     float targetBgBoat = 96;
@@ -271,7 +300,7 @@ class StateWar {
     rectLifeBg.setPosition(textPointPos.x, textPointPos.y + 32);
 
     auto rectLifeBgPos = rectLifeBg.getPosition();
-    rectLife.setPosition(rectLifeBgPos.x, rectLifeBgPos.y + 3);
+    rectLife.setPosition(rectLifeBgPos.x + 3, rectLifeBgPos.y + 3);
 
     window.draw(rectLifeBg);
     window.draw(rectLife);
