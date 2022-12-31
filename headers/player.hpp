@@ -12,7 +12,7 @@ using namespace sf;
 class Player {
  private:
   Asset *asset;
-  float velocity = 5;
+  float velocity = 3;
 
   Clock clock;
   float elapsedTime = 0;

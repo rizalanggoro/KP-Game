@@ -181,6 +181,23 @@ class Tilemap {
           }
         }
 
+        // todo: draw dirt
+        {
+          int firstGid = 93;
+          int tileType = this->vectorTilelayerDirt.at(index);
+          if (tileType != 0) {
+            int tileIndex = tileType - firstGid;
+
+            Sprite sprite{};
+            sprite.setTexture(this->asset->getVectorDirt()->at(tileIndex));
+            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
+            sprite.setPosition(this->tileTargetSize * w,
+                               this->tileTargetSize * h);
+
+            window.draw(sprite);
+          }
+        }
+
         // todo: draw trunk
         {
           int firstGid = 161;
@@ -207,23 +224,6 @@ class Tilemap {
 
             Sprite sprite{};
             sprite.setTexture(this->asset->getVectorHome()->at(tileIndex));
-            sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
-            sprite.setPosition(this->tileTargetSize * w,
-                               this->tileTargetSize * h);
-
-            window.draw(sprite);
-          }
-        }
-
-        // todo: draw dirt
-        {
-          int firstGid = 93;
-          int tileType = this->vectorTilelayerDirt.at(index);
-          if (tileType != 0) {
-            int tileIndex = tileType - firstGid;
-
-            Sprite sprite{};
-            sprite.setTexture(this->asset->getVectorDirt()->at(tileIndex));
             sprite.setScale(this->tileScaleFactor, this->tileScaleFactor);
             sprite.setPosition(this->tileTargetSize * w,
                                this->tileTargetSize * h);
