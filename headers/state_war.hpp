@@ -28,22 +28,20 @@ class StateWar {
   bool isInitialized = false;
 
   int boatLevel = -1;
+  float damage = -1;
   float boatVelocity = -1;
+  float bulletVelocity = -1;
   float life = -1;
   float maxLife = -1;
   int points = 0;
 
-  bool isGameOver = true;
+  bool isGameOver = false;
 
   Asset asset{"war"};
   View view{};
 
   TilemapWar tilemapWar{&asset};
   PlayerBoat playerBoat{&asset, &tilemapWar};
-
-  // json jsonBoats;
-  // json jsonProfile;
-  // bool isJsonLoaded = false;
 
   vector<EnemyBoat> vectorEnemyBoat{};
   Clock clockEnemyBoat;
@@ -52,6 +50,10 @@ class StateWar {
 
   float colliderMapSize = 128;
   Vector2i playerRealPos;
+
+  Clock clockReturn{};
+  int returnTextIndex = 0;
+  float returnTextInterval = 0;
 
   void moveMap(Direction direction) {
     float mapMaxY = this->window->getSize().y -
@@ -235,7 +237,7 @@ class StateWar {
     // todo: draw total point
     Text totalPoint{};
     totalPoint.setFont(*this->asset.getFont());
-    totalPoint.setString("Total points: 0");
+    totalPoint.setString("Total points: " + to_string(this->points));
     totalPoint.setFillColor(Color(192, 192, 192, 255));
     totalPoint.setCharacterSize(24);
 
@@ -246,33 +248,60 @@ class StateWar {
 
     window.draw(totalPoint);
 
+    string returnText[] = {
+        ">>   PRESS ENTER TO GO HOME   <<",
+        ">>  PRESS ENTER TO GO HOME  <<",
+        ">> PRESS ENTER TO GO HOME <<",
+    };
+
+    this->returnTextInterval =
+        this->clockReturn.getElapsedTime().asMilliseconds();
+    if (this->returnTextInterval >= 250) {
+      if (this->returnTextIndex < 2)
+        this->returnTextIndex++;
+      else
+        this->returnTextIndex = 0;
+      this->clockReturn.restart();
+    }
+
+    Text textReturn{};
+    textReturn.setString(returnText[this->returnTextIndex]);
+    textReturn.setFillColor(Color::White);
+    textReturn.setCharacterSize(16);
+    textReturn.setFont(*this->asset.getFont());
+
+    auto textReturnBounds = textReturn.getGlobalBounds();
+    textReturn.setPosition(wCenter.x - textReturnBounds.width / 2,
+                           wSize.y - 48 - textReturnBounds.height);
+    window.draw(textReturn);
+
     // todo: draw button back
-    Sprite bgButton{};
-    bgButton.setTexture(*this->asset.getTextureBigButton());
-    bgButton.setScale(64 / 27, 64 / 27);
+    // Sprite bgButton{};
+    // bgButton.setTexture(*this->asset.getTextureBigButton());
+    // bgButton.setScale(64 / 27, 64 / 27);
 
-    auto totalPointPos = totalPoint.getPosition();
-    auto bgButtonBounds = bgButton.getGlobalBounds();
-    bgButton.setPosition(wCenter.x - bgButtonBounds.width / 2,
-                         wSize.y - bgButtonBounds.height - 48);
+    // auto totalPointPos = totalPoint.getPosition();
+    // auto bgButtonBounds = bgButton.getGlobalBounds();
+    // bgButton.setPosition(wCenter.x - bgButtonBounds.width / 2,
+    //                      wSize.y - bgButtonBounds.height - 48);
 
-    window.draw(bgButton);
+    // window.draw(bgButton);
 
     // todo: draw text button back
-    Text textButtonBack{};
-    textButtonBack.setString("RETURN");
-    textButtonBack.setFont(*this->asset.getFont());
-    textButtonBack.setCharacterSize(16);
-    textButtonBack.setFillColor(Color(182, 137, 98, 255));
+    // Text textButtonBack{};
+    // textButtonBack.setString("RETURN");
+    // textButtonBack.setFont(*this->asset.getFont());
+    // textButtonBack.setCharacterSize(16);
+    // textButtonBack.setFillColor(Color(182, 137, 98, 255));
 
-    auto bgButtonPos = bgButton.getPosition();
-    auto textButtonBackBounds = textButtonBack.getGlobalBounds();
-    textButtonBack.setPosition(
-        bgButtonPos.x + (bgButtonBounds.width - textButtonBackBounds.width) / 2,
-        bgButtonPos.y +
-            (bgButtonBounds.height - textButtonBackBounds.height) * 2 / 5);
+    // auto bgButtonPos = bgButton.getPosition();
+    // auto textButtonBackBounds = textButtonBack.getGlobalBounds();
+    // textButtonBack.setPosition(
+    //     bgButtonPos.x + (bgButtonBounds.width - textButtonBackBounds.width) /
+    //     2, bgButtonPos.y +
+    //         (bgButtonBounds.height - textButtonBackBounds.height) * 2 / 5);
 
-    window.draw(textButtonBack);
+    // window.draw(textButtonBack);
   }
 
   void drawGuiBoatStats(RenderWindow &window) {
@@ -335,6 +364,11 @@ class StateWar {
 
     window.draw(rectLifeBg);
     window.draw(rectLife);
+
+    if (this->life <= 0) {
+      this->life = 0;
+      this->isGameOver = true;
+    }
   }
 
   void initialize() {
@@ -362,18 +396,23 @@ class StateWar {
     // todo: load data
     this->boatLevel =
         (*this->data->getJsonProfile())["selectedBoat"].get<int>();
+    this->damage =
+        (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][0]
+            .get<float>();
     this->boatVelocity =
         (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][1]
+            .get<float>();
+    this->bulletVelocity =
+        (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][2]
             .get<float>();
     this->life =
         (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][3]
             .get<float>();
-    this->maxLife =
-        (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][3]
-            .get<float>();
+    this->maxLife = this->life;
 
     this->playerBoat.setLevel(this->boatLevel);
     this->playerBoat.setVelocity(this->boatVelocity);
+    this->playerBoat.setBulletVelocity(this->bulletVelocity);
   }
 
  public:
@@ -394,9 +433,28 @@ class StateWar {
       }
     } else if (event.type == Event::KeyPressed) {
       auto code = event.key.code;
+      if (code == Keyboard::Enter) {
+        if (this->isGameOver) {
+          // todo: save points
+          int currentPoint =
+              (*this->data->getJsonProfile())["points"].get<int>();
+          (*this->data->getJsonProfile())["points"] =
+              (currentPoint + this->points);
+          this->data->save();
+          this->data->load();
+
+          // todo: reset state
+          *this->state = "world";
+          this->isGameOver = false;
+          this->isInitialized = false;
+          this->points = 0;
+        }
+      }
       if (code == Keyboard::Escape) {
-        *this->state = "world";
-        this->isInitialized = false;
+        // if (this->isGameOver) {
+        //   *this->state = "world";
+        //   this->isInitialized = false;
+        // }
       }
     }
   }
@@ -409,7 +467,7 @@ class StateWar {
       this->spawnEnemyBoatInterval =
           this->clockEnemyBoat.getElapsedTime().asMilliseconds();
       if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
-        if (this->vectorEnemyBoat.size() <= 9) {
+        if (this->vectorEnemyBoat.size() <= 3) {
           EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
                                  &this->playerBoat};
           int randomPos[5][2] = {
@@ -432,41 +490,44 @@ class StateWar {
     this->handleKeyboard();
 
     this->tilemapWar.draw(window);
-    this->playerBoat.draw(window);
+
+    if (!this->isGameOver) this->playerBoat.draw(window);
 
     // todo: draw enemy
-    for (int a = 0; a < this->vectorEnemyBoat.size(); a++) {
-      EnemyBoat *enemyBoat = &this->vectorEnemyBoat.at(a);
-      enemyBoat->draw(window);
+    if (!this->isGameOver)
+      for (int a = 0; a < this->vectorEnemyBoat.size(); a++) {
+        EnemyBoat *enemyBoat = &this->vectorEnemyBoat.at(a);
+        enemyBoat->draw(window);
 
-      // todo: check collision
-      for (int b = 0; b < this->playerBoat.getVectorFire()->size(); b++) {
-        Fire *fire = &this->playerBoat.getVectorFire()->at(b);
-        if (enemyBoat->getColliderFire()->getGlobalBounds().intersects(
-                fire->getSprite()->getGlobalBounds())) {
-          this->playerBoat.getVectorFire()->erase(
-              this->playerBoat.getVectorFire()->begin() + b);
-          enemyBoat->decreaseHp(10);
+        // todo: check collision
+        for (int b = 0; b < this->playerBoat.getVectorFire()->size(); b++) {
+          Fire *fire = &this->playerBoat.getVectorFire()->at(b);
+          if (enemyBoat->getColliderFire()->getGlobalBounds().intersects(
+                  fire->getFireCollider()->getGlobalBounds())) {
+            this->playerBoat.getVectorFire()->erase(
+                this->playerBoat.getVectorFire()->begin() + b);
+            enemyBoat->decreaseHp(this->damage);
+          }
         }
-      }
 
-      // todo: check hp
-      if (enemyBoat->getHp() <= 0) {
-        this->vectorEnemyBoat.erase(this->vectorEnemyBoat.begin() + a);
-      }
-
-      // todo: check collision enemy's fire and player
-      for (int b = 0; b < enemyBoat->getVectorFire()->size(); b++) {
-        Fire *fire = &enemyBoat->getVectorFire()->at(b);
-        if (this->playerBoat.getColliderBoxFire()->getGlobalBounds().intersects(
-                fire->getSprite()->getGlobalBounds())) {
-          enemyBoat->getVectorFire()->erase(
-              enemyBoat->getVectorFire()->begin() + b);
-          this->life -= 5;
+        // todo: check hp
+        if (enemyBoat->getHp() <= 0) {
+          this->vectorEnemyBoat.erase(this->vectorEnemyBoat.begin() + a);
           this->points += 5;
         }
+
+        // todo: check collision enemy's fire and player
+        for (int b = 0; b < enemyBoat->getVectorFire()->size(); b++) {
+          Fire *fire = &enemyBoat->getVectorFire()->at(b);
+          if (this->playerBoat.getColliderBoxFire()
+                  ->getGlobalBounds()
+                  .intersects(fire->getFireCollider()->getGlobalBounds())) {
+            enemyBoat->getVectorFire()->erase(
+                enemyBoat->getVectorFire()->begin() + b);
+            if (!this->isGameOver) this->life -= this->damage / 2;
+          }
+        }
       }
-    }
 
     // todo: reset view
     this->window->setView(this->window->getDefaultView());

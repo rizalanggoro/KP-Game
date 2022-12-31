@@ -18,6 +18,7 @@ class EnemyBoat {
   TilemapWar *tilemap;
   PlayerBoat *playerBoat;
 
+  int boatLevel = 1;
   float boatSize = 128;
   float boatTargetSize = 80;
   float boatScaleFactor = 1;
@@ -34,7 +35,7 @@ class EnemyBoat {
 
   Clock clockFire;
   float fireInterval = 0;
-  float fireDelay = 250;
+  float fireDelay = 500;
   float fireFrameIndex = 0;
 
   vector<Fire> vectorFire{};
@@ -43,9 +44,10 @@ class EnemyBoat {
     this->fireInterval = this->clockFire.getElapsedTime().asMilliseconds();
 
     if (this->fireInterval >=
-        this->fireDelay / this->asset->getVectorBoats()->at(0).size()) {
+        this->fireDelay /
+            this->asset->getVectorBoats()->at(this->boatLevel).size()) {
       if (this->fireFrameIndex <
-          this->asset->getVectorBoats()->at(0).size() - 1)
+          this->asset->getVectorBoats()->at(this->boatLevel).size() - 1)
         this->fireFrameIndex++;
       else {
         this->fireFrameIndex = 0;
@@ -53,7 +55,7 @@ class EnemyBoat {
         auto playerPos = this->enemy.getPosition();
         Fire newFire{this->asset, dir};
         newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
-        newFire.setVelocity(this->enemyVelocity * 2);
+        newFire.setVelocity(this->playerBoat->getBulletVelocity() * .8);
 
         this->vectorFire.push_back(newFire);
       }
@@ -68,6 +70,7 @@ class EnemyBoat {
   int getHp() { return this->hp; }
   void decreaseHp(int num) { this->hp -= num; }
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
+  void setBoatLevel(int level) { this->boatLevel = level; }
 
   EnemyBoat(Asset *asset, TilemapWar *tilemap, PlayerBoat *playerBoat) {
     this->asset = asset;
@@ -85,7 +88,9 @@ class EnemyBoat {
   }
 
   void draw(RenderWindow &window) {
-    this->enemy.setTexture(this->asset->getVectorBoats()->at(0).at(0));
+    this->enemy.setTexture(this->asset->getVectorBoats()
+                               ->at(this->boatLevel)
+                               .at(this->fireFrameIndex));
     this->enemy.setColor(Color(163, 91, 112, 255));
     this->enemy.setOrigin(this->boatSize / 2, this->boatSize / 2);
     this->enemy.setScale(this->boatScaleFactor, this->boatScaleFactor);
@@ -158,6 +163,8 @@ class EnemyBoat {
               ->getGlobalBounds()
               .intersects(this->colliderRight.getGlobalBounds())) {
         this->fire("r");
+        this->boatDirection = "r";
+        this->enemy.setRotation(270);
       } else {
         this->boatDirection = "r";
         this->enemy.setRotation(270);
@@ -173,6 +180,8 @@ class EnemyBoat {
               ->getGlobalBounds()
               .intersects(this->colliderLeft.getGlobalBounds())) {
         this->fire("l");
+        this->boatDirection = "l";
+        this->enemy.setRotation(90);
       } else {
         this->boatDirection = "l";
         this->enemy.setRotation(90);
@@ -187,6 +196,8 @@ class EnemyBoat {
       if (this->playerBoat->getColliderUpEnemy()->getGlobalBounds().intersects(
               this->colliderDown.getGlobalBounds())) {
         this->fire("d");
+        this->boatDirection = "d";
+        this->enemy.setRotation(0);
       } else {
         this->boatDirection = "d";
         this->enemy.setRotation(0);
@@ -202,6 +213,8 @@ class EnemyBoat {
               ->getGlobalBounds()
               .intersects(this->colliderUp.getGlobalBounds())) {
         this->fire("u");
+        this->boatDirection = "u";
+        this->enemy.setRotation(180);
       } else {
         this->boatDirection = "u";
         this->enemy.setRotation(180);

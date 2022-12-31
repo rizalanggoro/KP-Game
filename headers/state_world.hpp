@@ -438,7 +438,7 @@ class StateWorld {
     auto titlePos = title.getPosition();
     auto subtitleBounds = subtitle.getGlobalBounds();
     subtitle.setPosition(wCenter.x - subtitleBounds.width / 2,
-                         titlePos.y + titleBounds.height + 32);
+                         window.getSize().y - subtitleBounds.height - 48);
     window.draw(subtitle);
   }
 

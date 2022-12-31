@@ -28,6 +28,7 @@ class PlayerBoat {
   float boatScaleFactor = 1;
 
   float velocity = 5;
+  float bulletVelocity = 10;
 
   RectangleShape colliderBox{}, colliderBoxEnemy{}, colliderBoxFire{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
@@ -64,6 +65,10 @@ class PlayerBoat {
 
   float getVelocity() { return this->velocity; }
   void setVelocity(float velocity) { this->velocity = velocity; }
+  void setBulletVelocity(float bulletVelocity) {
+    this->bulletVelocity = bulletVelocity;
+  }
+  float getBulletVelocity() { return this->bulletVelocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
   Sprite *getSprite() { return &this->player; }
 
@@ -131,7 +136,7 @@ class PlayerBoat {
         auto playerPos = this->player.getPosition();
         Fire newFire{this->asset, this->playerDirection};
         newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
-        newFire.setVelocity(this->velocity * 2);
+        newFire.setVelocity(this->bulletVelocity);
 
         this->vectorFire.push_back(newFire);
       }
