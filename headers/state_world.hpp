@@ -283,7 +283,6 @@ class StateWorld {
     // todo: draw boat list
     auto bgBoatSize = (bgSize.width - 64) / 4;
     float bgBoatScaleFactor = bgBoatSize / 32;
-    // int prices[] = {0, 300, 600, 1200};
     Vector2f _bgBoatPos;
     for (int a = 0; a < 4; a++) {
       Sprite *buttonBoat;

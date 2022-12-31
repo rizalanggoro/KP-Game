@@ -9,6 +9,8 @@
 #include "json.hpp"
 #include "player.hpp"
 
+// #define DEBUG
+
 using namespace std;
 using namespace sf;
 using json = nlohmann::json;
@@ -83,7 +85,7 @@ class Tilemap {
         if (tileType != 0) {
           RectangleShape rect{};
           rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
-          rect.setFillColor(Color(255, 0, 0, 50));
+          rect.setFillColor(Color::Transparent);
           rect.setPosition(this->tileTargetSize * w, this->tileTargetSize * h);
           this->vectorCollision.push_back(rect);
         }

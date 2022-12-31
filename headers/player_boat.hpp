@@ -171,24 +171,13 @@ class PlayerBoat {
 
     window.draw(this->player);
 
-    // todo: draw cannon
-    auto playerPos = this->player.getPosition();
-    // this->playerCannon.setTexture(
-    //     this->asset->getVectorCannon4()->at(this->currFrameCannonIndex));
-    // this->playerCannon.setPosition(playerPos.x, playerPos.y);
-    // this->playerCannon.setOrigin(boatCannonSize / 2, boatCannonSize / 2);
-    // this->playerCannon.setRotation(this->parseDirection(this->playerDirection));
-    // this->playerCannon.setScale(this->boatCannonScaleFactor,
-    //                             this->boatCannonScaleFactor);
-
-    // window.draw(this->playerCannon);
-
     // todo: draw rect
+    auto playerPos = this->player.getPosition();
     this->colliderBox.setFillColor(Color::Transparent);
     this->colliderBox.setPosition(playerPos.x - this->boatTargetSize / 2,
                                   playerPos.y - this->boatTargetSize / 2);
     this->colliderBox.setOutlineThickness(-2);
-    this->colliderBox.setOutlineColor(Color(255, 0, 0, 50));
+    this->colliderBox.setOutlineColor(Color::Transparent);
     this->colliderBox.setSize(
         Vector2f(this->boatTargetSize, this->boatTargetSize));
 
@@ -203,7 +192,7 @@ class PlayerBoat {
     this->colliderRight.setSize(vColliderSize);
     this->colliderLeft.setSize(vColliderSize);
 
-    auto colliderColor = Color(0, 0, 255, 50);
+    auto colliderColor = Color::Transparent;
     this->colliderUp.setFillColor(colliderColor);
     this->colliderDown.setFillColor(colliderColor);
     this->colliderRight.setFillColor(colliderColor);
@@ -229,7 +218,7 @@ class PlayerBoat {
     this->colliderBoxEnemy.setPosition(playerPos.x - this->boatTargetSize * 2,
                                        playerPos.y - this->boatTargetSize * 2);
     this->colliderBoxEnemy.setOutlineThickness(-2);
-    this->colliderBoxEnemy.setOutlineColor(Color(255, 0, 0, 50));
+    this->colliderBoxEnemy.setOutlineColor(Color::Transparent);
     this->colliderBoxEnemy.setSize(
         Vector2f(this->boatTargetSize * 4, this->boatTargetSize * 4));
 
@@ -246,7 +235,7 @@ class PlayerBoat {
     this->colliderRightEnemy.setSize(vColliderEnemySize);
     this->colliderLeftEnemy.setSize(vColliderEnemySize);
 
-    auto colliderEnemyColor = Color(0, 0, 255, 50);
+    auto colliderEnemyColor = Color::Transparent;
     this->colliderUpEnemy.setFillColor(colliderEnemyColor);
     this->colliderDownEnemy.setFillColor(colliderEnemyColor);
     this->colliderRightEnemy.setFillColor(colliderEnemyColor);
@@ -272,7 +261,7 @@ class PlayerBoat {
     // todo: draw collider box fire
     this->colliderBoxFire.setFillColor(Color::Transparent);
     this->colliderBoxFire.setOutlineThickness(-2);
-    this->colliderBoxFire.setOutlineColor(Color(0, 255, 0, 255));
+    this->colliderBoxFire.setOutlineColor(Color::Transparent);
     if (this->playerDirection == "u" || this->playerDirection == "d") {
       this->colliderBoxFire.setSize(
           Vector2f(this->boatTargetSize / 2, this->boatTargetSize));

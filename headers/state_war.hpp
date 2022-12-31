@@ -13,8 +13,6 @@
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
 
-#define DEBUG
-
 using json = nlohmann::json;
 using namespace std;
 using namespace sf;

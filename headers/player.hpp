@@ -122,9 +122,8 @@ class Player {
     auto playerPos = spritePlayer.getPosition();
     auto playerGlobalBounds = spritePlayer.getGlobalBounds();
 
-    rectColliderBox.setOutlineColor(Color(255, 0, 0, 50));
+    rectColliderBox.setOutlineColor(Color::Transparent);
     rectColliderBox.setOutlineThickness(-this->velocity);
-    // rectColliderBox.setFillColor(Color::Red);
     rectColliderBox.setFillColor(Color::Transparent);
     rectColliderBox.setSize(Vector2f(this->playerSize, this->playerSize));
     rectColliderBox.setPosition(
@@ -143,7 +142,7 @@ class Player {
     colliderRight.setSize(Vector2f(this->velocity * 1, colliderSize));
     colliderLeft.setSize(Vector2f(this->velocity * 1, colliderSize));
 
-    auto color = Color(0, 255, 0, 255);
+    auto color = Color::Transparent;
     colliderUp.setFillColor(color);
     colliderDown.setFillColor(color);
     colliderRight.setFillColor(color);

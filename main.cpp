@@ -7,8 +7,6 @@
 #include "headers/state_war.hpp"
 #include "headers/state_world.hpp"
 
-// #define DEBUG
-
 using namespace sf;
 using namespace std;
 
@@ -17,7 +15,7 @@ int main() {
                       Style::Close);
   window.setFramerateLimit(60);
 
-  string state = "world";
+  string state = "war";
   Data data{};
   data.load();
 

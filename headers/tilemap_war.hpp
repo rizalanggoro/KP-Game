@@ -7,7 +7,6 @@
 
 #include "asset.hpp"
 #include "json.hpp"
-// #include "player_boat.hpp"
 
 using namespace std;
 using namespace sf;
@@ -18,7 +17,6 @@ class TilemapWar {
   Asset *asset;
 
   float tileSize = 16;
-  // float tileTargetSize = 48;
   float tileTargetSize = 32;
   float tileScaleFactor = 0;
 
@@ -69,7 +67,7 @@ class TilemapWar {
           int type = this->vectorTilelayerCollision.at(index);
           if (type != 0) {
             RectangleShape rect{};
-            rect.setFillColor(Color(255, 0, 0, 50));
+            rect.setFillColor(Color::Transparent);
             rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
             rect.setPosition(w * this->tileTargetSize,
                              h * this->tileTargetSize);
@@ -90,7 +88,7 @@ class TilemapWar {
           int type = this->vectorTilelayerCollisionMap.at(index);
           if (type != 0) {
             RectangleShape rect{};
-            rect.setFillColor(Color(255, 0, 0, 50));
+            rect.setFillColor(Color::Transparent);
             rect.setSize(Vector2f(this->tileTargetSize, this->tileTargetSize));
             rect.setPosition(w * this->tileTargetSize,
                              h * this->tileTargetSize);

@@ -101,7 +101,7 @@ class EnemyBoat {
 
     // todo: draw collider box
     this->colliderBox.setFillColor(Color::Transparent);
-    this->colliderBox.setOutlineColor(Color::Red);
+    this->colliderBox.setOutlineColor(Color::Transparent);
     this->colliderBox.setOutlineThickness(-2);
     this->colliderBox.setPosition(enemyPos.x - this->boatTargetSize / 2,
                                   enemyPos.y - this->boatTargetSize / 2);
@@ -132,7 +132,7 @@ class EnemyBoat {
     this->colliderRight.setSize(vColliderSize);
     this->colliderLeft.setSize(vColliderSize);
 
-    auto colliderColor = Color(0, 0, 255, 50);
+    auto colliderColor = Color::Transparent;
     this->colliderUp.setFillColor(colliderColor);
     this->colliderDown.setFillColor(colliderColor);
     this->colliderRight.setFillColor(colliderColor);
@@ -239,7 +239,7 @@ class EnemyBoat {
         ((dir == "u" || dir == "d") ? 0 : this->boatTargetSize / 4);
 
     this->colliderFire.setFillColor(Color::Transparent);
-    this->colliderFire.setOutlineColor(Color::Green);
+    this->colliderFire.setOutlineColor(Color::Transparent);
     this->colliderFire.setOutlineThickness(2);
     this->colliderFire.setSize(Vector2f(colliderFireX, colliderFireY));
     this->colliderFire.setPosition(colliderFirePosX, colliderFirePoxY);
