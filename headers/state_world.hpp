@@ -35,12 +35,15 @@ class StateWorld {
 
   bool isInWarPoint = false;
   bool isInShopPoint = false;
-  bool isPaused = false;
-  bool isShopOpenned = true;
+  bool isConfirmExitShowed = false;
+  bool isShopOpenned = false;
 
   Sprite buttonClose{}, buttonAction{};
   Sprite buttonBoat1{}, buttonBoat2{}, buttonBoat3{}, buttonBoat4{};
   int shopSelectedBoatIndex = 0;
+
+  Clock clockFramerate{};
+  float multiplier = 1;
 
   void moveMap(Direction direction) {
     float mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
@@ -49,7 +52,7 @@ class StateWorld {
 
     float px = this->playerRealPos.x;
     float py = this->playerRealPos.y;
-    float pv = this->player.getVelocity();
+    float pv = this->player.getVelocity() * this->multiplier;
     float pdv = pv * sqrt(2) / 2;
 
     switch (direction) {
@@ -96,10 +99,6 @@ class StateWorld {
     bool keyDown = Keyboard::isKeyPressed(Keyboard::Down);
     bool keyRight = Keyboard::isKeyPressed(Keyboard::Right);
     bool keyLeft = Keyboard::isKeyPressed(Keyboard::Left);
-
-    // auto mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
-    // auto mapMaxX = this->window->getSize().x - 48 - this->colliderMapSize;
-    // auto mapMin = this->colliderMapSize;
 
     // todo: handle two direction move
     if (keyDown && keyLeft) {
@@ -193,13 +192,10 @@ class StateWorld {
   }
 
   void drawGui(RenderWindow &window) {
-    RectangleShape rect{};
-    rect.setFillColor(Color::Red);
-    rect.setSize(Vector2f(100, 100));
-    window.draw(rect);
+    this->drawGuiPoints(window);
 
-    if (this->isPaused) this->drawPauseMenu(window);
-    if (!this->isPaused) {
+    if (this->isConfirmExitShowed) this->drawConfirmExit(window);
+    if (!this->isConfirmExitShowed) {
       if (this->isInWarPoint) {
         this->drawInstruction(window,
                               "Press enter to go to the battlefield "
@@ -213,6 +209,33 @@ class StateWorld {
         this->drawShop(window);
       }
     }
+  }
+
+  void drawGuiPoints(RenderWindow &window) {
+    Sprite coin{};
+    coin.setTexture(*this->asset.getTextureCoin());
+    coin.setScale(40 / 12, 40 / 12);
+    coin.setPosition(16, 16);
+    window.draw(coin);
+
+    auto coinPos = coin.getPosition();
+    auto coinBounds = coin.getGlobalBounds();
+
+    Text textPoint{};
+    textPoint.setString(
+        to_string((*this->data->getJsonProfile())["points"].get<int>()));
+    textPoint.setCharacterSize(20);
+    textPoint.setFont(*this->asset.getFont());
+    textPoint.setFillColor(Color::White);
+    textPoint.setOutlineColor(Color(0, 0, 0, 200));
+    textPoint.setOutlineThickness(2);
+    textPoint.setLetterSpacing(1.32);
+
+    auto textPointBounds = textPoint.getGlobalBounds();
+    textPoint.setPosition(
+        coinPos.x + coinBounds.width + 16,
+        coinPos.y + (coinBounds.height - textPointBounds.height) / 2);
+    window.draw(textPoint);
   }
 
   void drawShop(RenderWindow &window) {
@@ -260,7 +283,7 @@ class StateWorld {
     // todo: draw boat list
     auto bgBoatSize = (bgSize.width - 64) / 4;
     float bgBoatScaleFactor = bgBoatSize / 32;
-    int prices[] = {0, 300, 600, 1200};
+    // int prices[] = {0, 300, 600, 1200};
     Vector2f _bgBoatPos;
     for (int a = 0; a < 4; a++) {
       Sprite *buttonBoat;
@@ -293,10 +316,12 @@ class StateWorld {
 
       // todo: draw price
       auto boatPos = boat.getPosition();
+      auto jsonBoats = (*this->data->getJsonBoats())["boats"];
+
       Text price{};
       price.setFont(*this->asset.getFont());
       if (!isOwned)
-        price.setString("$" + to_string(prices[a]));
+        price.setString("$" + to_string(jsonBoats[a]["price"].get<int>()));
       else {
         if ((*this->data->getJsonProfile())["selectedBoat"] == (a + 1))
           price.setString("Used");
@@ -383,35 +408,38 @@ class StateWorld {
     window.draw(textButtonAction);
   }
 
-  void drawPauseMenu(RenderWindow &window) {
+  void drawConfirmExit(RenderWindow &window) {
     auto wCenter = window.getView().getCenter();
 
     RectangleShape bgDark{};
-    bgDark.setFillColor(Color(0, 0, 0, 100));
+    bgDark.setFillColor(Color(0, 0, 0, 150));
     bgDark.setSize(Vector2f(window.getSize().x, window.getSize().y));
     window.draw(bgDark);
 
-    Sprite background{};
-    background.setTexture(*this->asset.getTextureBackgroundMenu());
-    background.setScale(720 / 128, window.getSize().y / 144);
-
-    auto bgBounds = background.getGlobalBounds();
-    background.setPosition(wCenter.x - (bgBounds.width / 2),
-                           wCenter.y - (bgBounds.height / 2));
-    window.draw(background);
-
-    auto bgPos = background.getPosition();
-
     Text title{};
     title.setFont(*this->asset.getFont());
-    title.setString("Paused!");
+    title.setString("Do you want to exit the game?");
+    title.setCharacterSize(32);
+    title.setStyle(Text::Bold);
     title.setFillColor(Color::White);
 
     auto titleBounds = title.getGlobalBounds();
-    title.setPosition(bgPos.x + (bgBounds.width - titleBounds.width) / 2,
-                      bgPos.y + 3 * 8 * window.getSize().y / 144);
+    title.setPosition(wCenter.x - titleBounds.width / 2,
+                      wCenter.y - titleBounds.height / 2);
 
     window.draw(title);
+
+    Text subtitle{};
+    subtitle.setFont(*this->asset.getFont());
+    subtitle.setString(">> PRESS ENTER TO EXIT <<");
+    subtitle.setCharacterSize(16);
+    subtitle.setFillColor(Color::White);
+
+    auto titlePos = title.getPosition();
+    auto subtitleBounds = subtitle.getGlobalBounds();
+    subtitle.setPosition(wCenter.x - subtitleBounds.width / 2,
+                         titlePos.y + titleBounds.height + 32);
+    window.draw(subtitle);
   }
 
   void drawInstruction(RenderWindow &window, string instruction) {
@@ -471,14 +499,15 @@ class StateWorld {
         if (this->isInShopPoint) {
           this->isShopOpenned = true;
         }
+        if (this->isConfirmExitShowed) window->close();
       } else if (code == Keyboard::Escape) {
         if (this->isShopOpenned) {
           this->isShopOpenned = false;
         } else {
-          if (this->isPaused) {
-            this->isPaused = false;
+          if (this->isConfirmExitShowed) {
+            this->isConfirmExitShowed = false;
           } else {
-            this->isPaused = true;
+            this->isConfirmExitShowed = true;
           }
         }
       }
@@ -514,24 +543,34 @@ class StateWorld {
           this->data->load();
         } else {
           // todo: buy a new boat
-          bool isOwned =
-              (*this->data
-                    ->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
-                                     ["owned"]
-                                         .get<bool>();
-          (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
-                                       ["owned"] = !isOwned;
-          this->data->save();
-          this->data->load();
+          json *jsonBoatsPtr = this->data->getJsonBoats();
+          json *jsonProfilePtr = this->data->getJsonProfile();
+
+          int points = (*jsonProfilePtr)["points"].get<int>();
+          int boatPrice =
+              (*jsonBoatsPtr)["boats"][this->shopSelectedBoatIndex]["price"]
+                  .get<int>();
+
+          if (points >= boatPrice) {
+            (*jsonProfilePtr)["points"] = (points - boatPrice);
+            (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
+                                         ["owned"] = true;
+
+            this->data->save();
+            this->data->load();
+          }
         }
       }
     }
   }
 
   void run(RenderWindow &window) {
+    this->multiplier = this->clockFramerate.restart().asSeconds() * 60;
     this->mouseRealPos = Mouse::getPosition(window);
 
-    if (!this->isPaused && !this->isShopOpenned) {
+    this->player.setMultiplier(this->multiplier);
+
+    if (!this->isConfirmExitShowed && !this->isShopOpenned) {
       this->handleKeyboard();
     }
 
@@ -539,15 +578,6 @@ class StateWorld {
 
     this->playerRealPos = window.mapCoordsToPixel(
         this->player.getRectColliderBox()->getPosition());
-
-    RectangleShape rect{};
-    rect.setOutlineColor(Color::Red);
-    rect.setOutlineThickness(2);
-
-    auto wSize = window.getSize();
-    rect.setSize(Vector2f(tilemap.getWidth() * 16, tilemap.getHeight() * 16));
-
-    window.draw(rect);
 
     // todo: draw ground
     tilemap.draw(window);

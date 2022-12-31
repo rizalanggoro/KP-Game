@@ -58,6 +58,7 @@ class Player {
   RectangleShape *getColliderDown() { return &this->colliderDown; }
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
+  void setMultiplier(float num) { this->velocity *num; }
 
   Player(Asset *asset) {
     this->asset = asset;

@@ -38,6 +38,7 @@ class Asset {
   Texture textureStar{};
   Texture textureBigButton{};
   Texture textureBackgroundPhoto{};
+  Texture textureCoin{};
 
   void loadFont() {
     string path = "assets/fonts/PressStart2P-Regular.ttf";
@@ -130,6 +131,7 @@ class Asset {
     this->textureButtonPlus.loadFromFile("assets/images/Button Plus.png");
     this->textureBigButton.loadFromFile("assets/images/UI Big Play Button.png");
     this->textureBackgroundPhoto.loadFromFile("assets/images/Bg Photo.png");
+    this->textureCoin.loadFromFile("assets/images/Coin.png");
   }
 
   void loadTextureChest() {
@@ -331,6 +333,7 @@ class Asset {
   Texture *getTextureBigButton() { return &this->textureBigButton; }
   Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
   Texture *getTextureBackgroundPhoto() { return &this->textureBackgroundPhoto; }
+  Texture *getTextureCoin() { return &this->textureCoin; }
 
   vector<Texture> *getVectorSquareButtons() {
     return &this->vectorSquareButtons;
