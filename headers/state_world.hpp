@@ -8,6 +8,7 @@
 
 #include "asset.hpp"
 #include "data.hpp"
+#include "direction.hpp"
 #include "json.hpp"
 #include "player.hpp"
 #include "tilemap_world.hpp"

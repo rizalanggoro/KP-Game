@@ -7,10 +7,13 @@
 
 #include "asset.hpp"
 #include "data.hpp"
+#include "direction.hpp"
 #include "enemy_boat.hpp"
 #include "json.hpp"
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
+
+#define DEBUG
 
 using json = nlohmann::json;
 using namespace std;
@@ -28,6 +31,9 @@ class StateWar {
   float boatVelocity = -1;
   float life = -1;
   float maxLife = -1;
+  int points = 0;
+
+  bool isGameOver = true;
 
   Asset asset{"war"};
   View view{};
@@ -46,6 +52,59 @@ class StateWar {
 
   float colliderMapSize = 128;
   Vector2i playerRealPos;
+
+  void moveMap(Direction direction) {
+    float mapMaxY = this->window->getSize().y -
+                    this->playerBoat.getBoatTargetSize() -
+                    this->colliderMapSize;
+    float mapMaxX = this->window->getSize().x -
+                    this->playerBoat.getBoatTargetSize() -
+                    this->colliderMapSize;
+    float mapMin = this->colliderMapSize;
+
+    float px = this->playerRealPos.x;
+    float py = this->playerRealPos.y;
+    float pv = this->playerBoat.getVelocity();
+    float pdv = pv * sqrt(2) / 2;
+
+    switch (direction) {
+      case DIR_UP:
+        if (py <= mapMin) this->view.move(0, -pv);
+        break;
+
+      case DIR_DOWN:
+        if (py >= mapMaxY) this->view.move(0, pv);
+        break;
+
+      case DIR_RIGHT:
+        if (px >= mapMaxX) this->view.move(pv, 0);
+        break;
+
+      case DIR_LEFT:
+        if (px <= mapMin) this->view.move(-pv, 0);
+        break;
+
+      case DIR_UP_RIGHT:
+        if (py <= mapMin) this->view.move(0, -pdv);
+        if (px >= mapMaxX) this->view.move(pdv, 0);
+        break;
+
+      case DIR_UP_LEFT:
+        if (py <= mapMin) this->view.move(0, -pdv);
+        if (px <= mapMin) this->view.move(-pdv, 0);
+        break;
+
+      case DIR_DOWN_RIGHT:
+        if (py >= mapMaxY) this->view.move(0, pdv);
+        if (px >= mapMaxX) this->view.move(pdv, 0);
+        break;
+
+      case DIR_DOWN_LEFT:
+        if (py >= mapMaxY) this->view.move(0, pdv);
+        if (px <= mapMin) this->view.move(-pdv, 0);
+        break;
+    }
+  }
 
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
@@ -70,67 +129,81 @@ class StateWar {
     bool canMoveMapLeft =
         this->tilemapWar.canMoveMap(this->playerBoat.getColliderLeft());
 
-    auto mapMaxY = this->window->getSize().y -
-                   this->playerBoat.getBoatTargetSize() - this->colliderMapSize;
-    auto mapMaxX = this->window->getSize().x -
-                   this->playerBoat.getBoatTargetSize() - this->colliderMapSize;
-    auto mapMin = this->colliderMapSize;
-
     if (keyUp && keyRight) {
-      if (canMoveUp && canMoveRight)
+      if (canMoveUp && canMoveRight && canMoveMapUp && canMoveMapRight) {
+        this->moveMap(DIR_UP_RIGHT);
         this->playerBoat.moveUpRight();
-      else if (canMoveUp)
+      } else if (canMoveUp && canMoveMapUp) {
+        this->moveMap(DIR_UP);
         this->playerBoat.moveUp();
-      else if (canMoveRight)
+      } else if (canMoveRight && canMoveMapRight) {
+        this->moveMap(DIR_RIGHT);
         this->playerBoat.moveRight();
+      }
 
     } else if (keyUp && keyLeft) {
-      if (canMoveUp && canMoveLeft)
+      if (canMoveUp && canMoveLeft && canMoveMapUp && canMoveMapLeft) {
+        this->moveMap(DIR_UP_LEFT);
         this->playerBoat.moveUpLeft();
-      else if (canMoveUp)
+      } else if (canMoveUp && canMoveMapUp) {
+        this->moveMap(DIR_UP);
         this->playerBoat.moveUp();
-      else if (canMoveLeft)
+      } else if (canMoveLeft && canMoveMapLeft) {
+        this->moveMap(DIR_LEFT);
         this->playerBoat.moveLeft();
+      }
 
     } else if (keyDown && keyRight) {
-      if (canMoveDown && canMoveRight)
+      if (canMoveDown && canMoveRight && canMoveMapDown && canMoveMapRight) {
+        this->moveMap(DIR_DOWN_RIGHT);
         this->playerBoat.moveDownRight();
-      else if (canMoveDown)
+      } else if (canMoveDown && canMoveMapDown) {
+        this->moveMap(DIR_DOWN);
         this->playerBoat.moveDown();
-      else if (canMoveRight)
+      } else if (canMoveRight && canMoveMapRight) {
+        this->moveMap(DIR_RIGHT);
         this->playerBoat.moveRight();
+      }
 
     } else if (keyDown && keyLeft) {
-      if (canMoveDown && canMoveLeft)
+      if (canMoveDown && canMoveLeft && canMoveMapDown && canMoveMapLeft) {
+        this->moveMap(DIR_DOWN_LEFT);
         this->playerBoat.moveDownLeft();
-      else if (canMoveDown)
+      } else if (canMoveDown && canMoveMapDown) {
+        this->moveMap(DIR_DOWN);
         this->playerBoat.moveDown();
-      else if (canMoveLeft)
+      } else if (canMoveLeft && canMoveMapLeft) {
+        this->moveMap(DIR_LEFT);
         this->playerBoat.moveLeft();
+      }
     }
 
     else if (keyUp) {
       if (canMoveUp && canMoveMapUp) {
-        if (this->playerRealPos.y <= mapMin)
-          this->view.move(0, -this->playerBoat.getVelocity());
+        this->moveMap(DIR_UP);
+        // if (this->playerRealPos.y <= mapMin)
+        //   this->view.move(0, -this->playerBoat.getVelocity());
         this->playerBoat.moveUp();
       }
     } else if (keyDown) {
       if (canMoveDown && canMoveMapDown) {
-        if (this->playerRealPos.y >= mapMaxY)
-          this->view.move(0, this->playerBoat.getVelocity());
+        this->moveMap(DIR_DOWN);
+        // if (this->playerRealPos.y >= mapMaxY)
+        //   this->view.move(0, this->playerBoat.getVelocity());
         this->playerBoat.moveDown();
       }
     } else if (keyRight) {
       if (canMoveRight && canMoveMapRight) {
-        if (this->playerRealPos.x >= mapMaxX)
-          this->view.move(this->playerBoat.getVelocity(), 0);
+        this->moveMap(DIR_RIGHT);
+        // if (this->playerRealPos.x >= mapMaxX)
+        //   this->view.move(this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveRight();
       }
     } else if (keyLeft) {
       if (canMoveLeft && canMoveMapLeft) {
-        if (this->playerRealPos.x <= mapMin)
-          this->view.move(-this->playerBoat.getVelocity(), 0);
+        this->moveMap(DIR_LEFT);
+        // if (this->playerRealPos.x <= mapMin)
+        //   this->view.move(-this->playerBoat.getVelocity(), 0);
         this->playerBoat.moveLeft();
       }
     }
@@ -140,36 +213,7 @@ class StateWar {
     }
   }
 
-  void drawGui(RenderWindow &window) {
-    // todo: gui selected boat
-    // {
-    //   for (int a = 0; a < 4; a++) {
-    //     auto buttonSize = 136;
-    //     auto buttonScale = buttonSize / 48;
-    //     auto isSelected = this->playerBoat.getCurrentBoatIndex() == a;
-
-    //     Sprite spriteButton{};
-    //     spriteButton.setTexture(
-    //         this->asset.getVectorSquareButtons()->at(isSelected ? 0 : 4));
-    //     spriteButton.setPosition(buttonSize / 2 * a, 0);
-    //     spriteButton.setScale(buttonScale, buttonScale);
-
-    //     window.draw(spriteButton);
-
-    //     float boatSize = 56;
-    //     float boatScale = boatSize / 128;
-    //     Sprite spriteBoat{};
-    //     spriteBoat.setTexture(this->asset.getVectorBoatColor1()->at(a));
-    //     spriteBoat.setScale(boatScale, boatScale);
-    //     spriteBoat.setPosition(a * buttonSize / 2 + 20, 20);
-
-    //     window.draw(spriteBoat);
-    //   }
-    // }
-
-    this->drawGuiBoatStats(window);
-    // this->drawGuiPoint(window);
-  }
+  void drawGui(RenderWindow &window) { this->drawGuiBoatStats(window); }
 
   void drawGuiBoatStats(RenderWindow &window) {
     float targetBgBoat = 96;
@@ -201,7 +245,7 @@ class StateWar {
 
     // todo: draw point
     Text textPoint{};
-    textPoint.setString("Points: 0");
+    textPoint.setString("Points: " + to_string(this->points));
     textPoint.setFont(*this->asset.getFont());
     textPoint.setFillColor(Color::White);
     textPoint.setCharacterSize(16);
@@ -233,15 +277,11 @@ class StateWar {
     window.draw(rectLife);
   }
 
-  // void restart() {
-  //   this->boatLevel = -1;
-  //   this->boatVelocity = -1;
-  //   this->life = -1;
-  //   this->maxLife = -1;
-  // }
-
   void initialize() {
     cout << "initialize called" << endl;
+
+    this->playerBoat.getVectorFire()->clear();
+    this->vectorEnemyBoat.clear();
 
     this->isInitialized = true;
 
@@ -271,6 +311,9 @@ class StateWar {
     this->maxLife =
         (*this->data->getJsonBoats())["boats"][this->boatLevel - 1]["values"][3]
             .get<float>();
+
+    this->playerBoat.setLevel(this->boatLevel);
+    this->playerBoat.setVelocity(this->boatVelocity);
   }
 
  public:
@@ -301,26 +344,25 @@ class StateWar {
   void run(RenderWindow &window) {
     if (!this->isInitialized) this->initialize();
 
-    this->playerBoat.setLevel(this->boatLevel);
-    this->playerBoat.setVelocity(this->boatVelocity);
-
     // todo: spawn enemy boat
-    this->spawnEnemyBoatInterval =
-        this->clockEnemyBoat.getElapsedTime().asMilliseconds();
-    if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
-      if (this->vectorEnemyBoat.size() <= 9) {
-        EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
-                               &this->playerBoat};
-        int randomPos[5][2] = {
-            {6, 29}, {20, 53}, {50, 53}, {73, 35}, {40, 6},
-        };
-        int randomPosIndex = rand() % 5;
-        newEnemyBoat.setInitPos(randomPos[randomPosIndex][0],
-                                randomPos[randomPosIndex][1]);
-        this->vectorEnemyBoat.push_back(newEnemyBoat);
-      }
+    if (!this->isGameOver) {
+      this->spawnEnemyBoatInterval =
+          this->clockEnemyBoat.getElapsedTime().asMilliseconds();
+      if (this->spawnEnemyBoatInterval >= this->spawnEnemyBoatDelay) {
+        if (this->vectorEnemyBoat.size() <= 9) {
+          EnemyBoat newEnemyBoat{&this->asset, &this->tilemapWar,
+                                 &this->playerBoat};
+          int randomPos[5][2] = {
+              {6, 29}, {20, 53}, {50, 53}, {73, 35}, {40, 6},
+          };
+          int randomPosIndex = rand() % 5;
+          newEnemyBoat.setInitPos(randomPos[randomPosIndex][0],
+                                  randomPos[randomPosIndex][1]);
+          this->vectorEnemyBoat.push_back(newEnemyBoat);
+        }
 
-      this->clockEnemyBoat.restart();
+        this->clockEnemyBoat.restart();
+      }
     }
 
     this->playerRealPos = window.mapCoordsToPixel(
@@ -361,6 +403,7 @@ class StateWar {
           enemyBoat->getVectorFire()->erase(
               enemyBoat->getVectorFire()->begin() + b);
           this->life -= 5;
+          this->points += 5;
         }
       }
     }
