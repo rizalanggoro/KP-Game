@@ -24,9 +24,6 @@ class StateWorld {
   View view, viewGui;
   RenderWindow *window;
 
-  // json jsonBoatsData;
-  // json jsonProfile;
-
   Asset asset{"world"};
   Player player{&asset};
   Tilemap tilemap{&asset};
@@ -45,15 +42,64 @@ class StateWorld {
   Sprite buttonBoat1{}, buttonBoat2{}, buttonBoat3{}, buttonBoat4{};
   int shopSelectedBoatIndex = 0;
 
+  void moveMap(Direction direction) {
+    float mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
+    float mapMaxX = this->window->getSize().x - 48 - this->colliderMapSize;
+    float mapMin = this->colliderMapSize;
+
+    float px = this->playerRealPos.x;
+    float py = this->playerRealPos.y;
+    float pv = this->player.getVelocity();
+    float pdv = pv * sqrt(2) / 2;
+
+    switch (direction) {
+      case DIR_UP:
+        if (py <= mapMin) this->view.move(0, -pv);
+        break;
+
+      case DIR_DOWN:
+        if (py >= mapMaxY) this->view.move(0, pv);
+        break;
+
+      case DIR_RIGHT:
+        if (px >= mapMaxX) this->view.move(pv, 0);
+        break;
+
+      case DIR_LEFT:
+        if (px <= mapMin) this->view.move(-pv, 0);
+        break;
+
+      case DIR_UP_RIGHT:
+        if (py <= mapMin) this->view.move(0, -pdv);
+        if (px >= mapMaxX) this->view.move(pdv, 0);
+        break;
+
+      case DIR_UP_LEFT:
+        if (py <= mapMin) this->view.move(0, -pdv);
+        if (px <= mapMin) this->view.move(-pdv, 0);
+        break;
+
+      case DIR_DOWN_RIGHT:
+        if (py >= mapMaxY) this->view.move(0, pdv);
+        if (px >= mapMaxX) this->view.move(pdv, 0);
+        break;
+
+      case DIR_DOWN_LEFT:
+        if (py >= mapMaxY) this->view.move(0, pdv);
+        if (px <= mapMin) this->view.move(-pdv, 0);
+        break;
+    }
+  }
+
   void handleKeyboard() {
     bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
     bool keyDown = Keyboard::isKeyPressed(Keyboard::Down);
     bool keyRight = Keyboard::isKeyPressed(Keyboard::Right);
     bool keyLeft = Keyboard::isKeyPressed(Keyboard::Left);
 
-    auto mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
-    auto mapMaxX = this->window->getSize().x - 48 - this->colliderMapSize;
-    auto mapMin = this->colliderMapSize;
+    // auto mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
+    // auto mapMaxX = this->window->getSize().x - 48 - this->colliderMapSize;
+    // auto mapMin = this->colliderMapSize;
 
     // todo: handle two direction move
     if (keyDown && keyLeft) {
@@ -61,86 +107,86 @@ class StateWorld {
       auto canMoveDown = this->tilemap.canMove(this->player, "d");
       auto canMoveLeft = this->tilemap.canMove(this->player, "l");
 
-      if (canMoveDown && canMoveLeft)
-        // this->view.move(-speed, speed);
+      if (canMoveDown && canMoveLeft) {
+        this->moveMap(DIR_DOWN_LEFT);
         this->player.moveDownLeft();
-      else if (canMoveDown)
-        // this->view.move(0, speed);
+      } else if (canMoveDown) {
+        this->moveMap(DIR_DOWN);
         this->player.moveDown();
-      else if (canMoveLeft)
-        // this->view.move(-speed, 0);
+      } else if (canMoveLeft) {
+        this->moveMap(DIR_LEFT);
         this->player.moveLeft();
+      }
 
     } else if (keyDown && keyRight) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
       auto canMoveDown = this->tilemap.canMove(this->player, "d");
       auto canMoveRight = this->tilemap.canMove(this->player, "r");
 
-      if (canMoveDown && canMoveRight)
-        // this->view.move(speed, speed);
+      if (canMoveDown && canMoveRight) {
+        this->moveMap(DIR_DOWN_RIGHT);
         this->player.moveDownRight();
-      else if (canMoveDown)
-        // this->view.move(0, speed);
+      } else if (canMoveDown) {
+        this->moveMap(DIR_DOWN);
         this->player.moveDown();
-      else if (canMoveRight)
-        // this->view.move(speed, 0);
+      } else if (canMoveRight) {
+        this->moveMap(DIR_RIGHT);
         this->player.moveRight();
+      }
 
     } else if (keyUp && keyLeft) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
       auto canMoveUp = this->tilemap.canMove(this->player, "u");
       auto canMoveLeft = this->tilemap.canMove(this->player, "l");
 
-      if (canMoveUp && canMoveLeft)
-        // this->view.move(-speed, -speed);
+      if (canMoveUp && canMoveLeft) {
+        this->moveMap(DIR_UP_LEFT);
         this->player.moveUpLeft();
-      else if (canMoveUp)
-        // this->view.move(0, -speed);
+      } else if (canMoveUp) {
+        this->moveMap(DIR_UP);
         this->player.moveUp();
-      else if (canMoveLeft)
-        // this->view.move(-speed, 0);
+      } else if (canMoveLeft) {
+        this->moveMap(DIR_LEFT);
         this->player.moveLeft();
+      }
 
     } else if (keyUp && keyRight) {
       auto speed = sqrt(2) * this->player.getVelocity() / 2;
       auto canMoveUp = this->tilemap.canMove(this->player, "u");
       auto canMoveRight = this->tilemap.canMove(this->player, "r");
 
-      if (canMoveUp && canMoveRight)
-        // this->view.move(speed, -speed);
+      if (canMoveUp && canMoveRight) {
+        this->moveMap(DIR_UP_RIGHT);
         this->player.moveUpRight();
-      else if (canMoveUp)
-        // this->view.move(0, -speed);
+      } else if (canMoveUp) {
+        this->moveMap(DIR_UP);
         this->player.moveUp();
-      else if (canMoveRight)
-        // this->view.move(speed, 0);
+      } else if (canMoveRight) {
+        this->moveMap(DIR_RIGHT);
         this->player.moveRight();
+      }
 
     }
 
     // todo: handle one direction move
     else if (keyDown) {
       if (this->tilemap.canMove(player, "d")) {
-        if (this->playerRealPos.y >= mapMaxY)
-          this->view.move(0, this->player.getVelocity());
+        this->moveMap(DIR_DOWN);
         this->player.moveDown();
       }
     } else if (keyUp) {
       if (this->tilemap.canMove(player, "u")) {
-        if (this->playerRealPos.y <= mapMin)
-          this->view.move(0, -this->player.getVelocity());
+        this->moveMap(DIR_UP);
         this->player.moveUp();
       }
     } else if (keyLeft) {
       if (this->tilemap.canMove(player, "l")) {
-        if (this->playerRealPos.x <= mapMin)
-          this->view.move(-this->player.getVelocity(), 0);
+        this->moveMap(DIR_LEFT);
         this->player.moveLeft();
       }
     } else if (keyRight) {
       if (this->tilemap.canMove(player, "r")) {
-        if (this->playerRealPos.x >= mapMaxX)
-          this->view.move(this->player.getVelocity(), 0);
+        this->moveMap(DIR_RIGHT);
         this->player.moveRight();
       }
     }
@@ -386,27 +432,6 @@ class StateWorld {
 
     window.draw(text);
   }
-
-  // void loadJsonData() {
-  //   string path = "data/boats.json";
-  //   string pathProfile = "data/profile.json";
-
-  //   ifstream file(path), fileProfile(pathProfile);
-  //   this->jsonBoatsData = json::parse(file);
-  //   this->jsonProfile = json::parse(fileProfile);
-  // }
-
-  // void saveJsonData() {
-  //   string path = "data/boats.json";
-  //   ofstream file(path);
-  //   if (file << this->jsonBoatsData << endl) {
-  //     string pathProfile = "data/profile.json";
-  //     ofstream fileProfile(pathProfile);
-  //     if (fileProfile << this->jsonProfile << endl) {
-  //       this->loadJsonData();
-  //     }
-  //   }
-  // }
 
  public:
   StateWorld(string *state, RenderWindow *window, Data *data) {

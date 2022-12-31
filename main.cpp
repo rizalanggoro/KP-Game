@@ -17,7 +17,7 @@ int main() {
                       Style::Close);
   window.setFramerateLimit(60);
 
-  string state = "war";
+  string state = "world";
   Data data{};
   data.load();
 
