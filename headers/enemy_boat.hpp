@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "direction.hpp"
 #include "fire.hpp"
 #include "player_boat.hpp"
 #include "tilemap_war.hpp"
@@ -22,7 +23,8 @@ class EnemyBoat {
   float boatSize = 128;
   float boatTargetSize = 80;
   float boatScaleFactor = 1;
-  string boatDirection = "d";
+
+  Direction boatDirection = DIR_DOWN;
 
   int hp = 100;
   int maxHp = 100;
@@ -43,7 +45,7 @@ class EnemyBoat {
   Clock clockMultiplier{};
   float multiplier = 1;
 
-  void fire(string dir) {
+  void fire(Direction dir) {
     this->fireInterval = this->clockFire.getElapsedTime().asMilliseconds();
 
     if (this->fireInterval >=
@@ -168,11 +170,11 @@ class EnemyBoat {
       if (this->playerBoat->getColliderLeftEnemy()
               ->getGlobalBounds()
               .intersects(this->colliderRight.getGlobalBounds())) {
-        this->fire("r");
-        this->boatDirection = "r";
+        this->fire(DIR_RIGHT);
+        this->boatDirection = DIR_RIGHT;
         this->enemy.setRotation(270);
       } else {
-        this->boatDirection = "r";
+        this->boatDirection = DIR_RIGHT;
         this->enemy.setRotation(270);
         if (dx < this->enemyVelocity)
           this->enemy.setPosition(playerPos.x, enemyPos.y);
@@ -185,11 +187,11 @@ class EnemyBoat {
       if (this->playerBoat->getColliderRightEnemy()
               ->getGlobalBounds()
               .intersects(this->colliderLeft.getGlobalBounds())) {
-        this->fire("l");
-        this->boatDirection = "l";
+        this->fire(DIR_LEFT);
+        this->boatDirection = DIR_LEFT;
         this->enemy.setRotation(90);
       } else {
-        this->boatDirection = "l";
+        this->boatDirection = DIR_LEFT;
         this->enemy.setRotation(90);
         if (dx > this->enemyVelocity)
           this->enemy.setPosition(playerPos.x, enemyPos.y);
@@ -201,11 +203,11 @@ class EnemyBoat {
       // todo: move down
       if (this->playerBoat->getColliderUpEnemy()->getGlobalBounds().intersects(
               this->colliderDown.getGlobalBounds())) {
-        this->fire("d");
-        this->boatDirection = "d";
+        this->fire(DIR_DOWN);
+        this->boatDirection = DIR_DOWN;
         this->enemy.setRotation(0);
       } else {
-        this->boatDirection = "d";
+        this->boatDirection = DIR_DOWN;
         this->enemy.setRotation(0);
         if (dy < this->enemyVelocity)
           this->enemy.setPosition(enemyPos.x, playerPos.y);
@@ -218,11 +220,11 @@ class EnemyBoat {
       if (this->playerBoat->getColliderDownEnemy()
               ->getGlobalBounds()
               .intersects(this->colliderUp.getGlobalBounds())) {
-        this->fire("u");
-        this->boatDirection = "u";
+        this->fire(DIR_UP);
+        this->boatDirection = DIR_UP;
         this->enemy.setRotation(180);
       } else {
-        this->boatDirection = "u";
+        this->boatDirection = DIR_UP;
         this->enemy.setRotation(180);
         if (dy > this->enemyVelocity)
           this->enemy.setPosition(enemyPos.x, playerPos.y);
@@ -233,16 +235,18 @@ class EnemyBoat {
 
     // todo: draw collider fire
     auto dir = this->boatDirection;
-    float colliderFireX = (dir == "u" || dir == "d") ? this->boatTargetSize / 2
-                                                     : this->boatTargetSize;
-    float colliderFireY = (dir == "u" || dir == "d") ? this->boatTargetSize
-                                                     : this->boatTargetSize / 2;
+    float colliderFireX = (dir == DIR_UP || dir == DIR_DOWN)
+                              ? this->boatTargetSize / 2
+                              : this->boatTargetSize;
+    float colliderFireY = (dir == DIR_UP || dir == DIR_DOWN)
+                              ? this->boatTargetSize
+                              : this->boatTargetSize / 2;
     float colliderFirePosX =
         colliderBoxPos.x +
-        ((dir == "u" || dir == "d") ? this->boatTargetSize / 4 : 0);
+        ((dir == DIR_UP || dir == DIR_DOWN) ? this->boatTargetSize / 4 : 0);
     float colliderFirePoxY =
         colliderBoxPos.y +
-        ((dir == "u" || dir == "d") ? 0 : this->boatTargetSize / 4);
+        ((dir == DIR_UP || dir == DIR_DOWN) ? 0 : this->boatTargetSize / 4);
 
     this->colliderFire.setFillColor(Color::Transparent);
     this->colliderFire.setOutlineColor(Color::Transparent);

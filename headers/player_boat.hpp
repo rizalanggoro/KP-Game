@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "direction.hpp"
 #include "fire.hpp"
 #include "tilemap_war.hpp"
 
@@ -21,7 +22,7 @@ class PlayerBoat {
   Sprite player{};
   vector<Fire> vectorFire{};
 
-  string playerDirection = "r";
+  Direction playerDirection = DIR_RIGHT;
   int boatLevel = 1;
 
   float boatSize = 128;
@@ -48,16 +49,16 @@ class PlayerBoat {
 
   Sound soundBullet{};
 
-  int parseDirection(string dir) {
+  int parseDirection(Direction dir) {
     int angle = 0;
-    if (dir == "ur") angle = 225;
-    if (dir == "ul") angle = 135;
-    if (dir == "dr") angle = 315;
-    if (dir == "dl") angle = 45;
-    if (dir == "u") angle = 180;
-    if (dir == "d") angle = 0;
-    if (dir == "r") angle = 270;
-    if (dir == "l") angle = 90;
+    if (dir == DIR_UP_RIGHT) angle = 225;
+    if (dir == DIR_UP_LEFT) angle = 135;
+    if (dir == DIR_DOWN_RIGHT) angle = 315;
+    if (dir == DIR_DOWN_LEFT) angle = 45;
+    if (dir == DIR_UP) angle = 180;
+    if (dir == DIR_DOWN) angle = 0;
+    if (dir == DIR_RIGHT) angle = 270;
+    if (dir == DIR_LEFT) angle = 90;
 
     return angle;
   }
@@ -89,39 +90,39 @@ class PlayerBoat {
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
 
   void moveUpRight() {
-    this->playerDirection = "ur";
+    this->playerDirection = DIR_UP_RIGHT;
     auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(speed, -speed);
   }
   void moveUpLeft() {
-    this->playerDirection = "ul";
+    this->playerDirection = DIR_UP_LEFT;
     auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(-speed, -speed);
   }
   void moveDownRight() {
-    this->playerDirection = "dr";
+    this->playerDirection = DIR_DOWN_RIGHT;
     auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(speed, speed);
   }
   void moveDownLeft() {
-    this->playerDirection = "dl";
+    this->playerDirection = DIR_DOWN_LEFT;
     auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(-speed, speed);
   }
   void moveUp() {
-    this->playerDirection = "u";
+    this->playerDirection = DIR_UP;
     this->player.move(0, -this->velocity * this->multiplier);
   }
   void moveDown() {
-    this->playerDirection = "d";
+    this->playerDirection = DIR_DOWN;
     this->player.move(0, this->velocity * this->multiplier);
   }
   void moveRight() {
-    this->playerDirection = "r";
+    this->playerDirection = DIR_RIGHT;
     this->player.move(this->velocity * this->multiplier, 0);
   }
   void moveLeft() {
-    this->playerDirection = "l";
+    this->playerDirection = DIR_LEFT;
     this->player.move(-this->velocity * this->multiplier, 0);
   }
 
@@ -269,12 +270,13 @@ class PlayerBoat {
     this->colliderBoxFire.setFillColor(Color::Transparent);
     this->colliderBoxFire.setOutlineThickness(-2);
     this->colliderBoxFire.setOutlineColor(Color::Transparent);
-    if (this->playerDirection == "u" || this->playerDirection == "d") {
+    if (this->playerDirection == DIR_UP || this->playerDirection == DIR_DOWN) {
       this->colliderBoxFire.setSize(
           Vector2f(this->boatTargetSize / 2, this->boatTargetSize));
       this->colliderBoxFire.setPosition(playerPos.x - this->boatTargetSize / 4,
                                         playerPos.y - this->boatTargetSize / 2);
-    } else if (this->playerDirection == "r" || this->playerDirection == "l") {
+    } else if (this->playerDirection == DIR_RIGHT ||
+               this->playerDirection == DIR_LEFT) {
       this->colliderBoxFire.setSize(
           Vector2f(this->boatTargetSize, this->boatTargetSize / 2));
       this->colliderBoxFire.setPosition(playerPos.x - this->boatTargetSize / 2,

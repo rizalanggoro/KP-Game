@@ -3,7 +3,6 @@
 
 #include "headers/asset.hpp"
 #include "headers/data.hpp"
-#include "headers/state_test.hpp"
 #include "headers/state_war.hpp"
 #include "headers/state_world.hpp"
 

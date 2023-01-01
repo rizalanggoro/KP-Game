@@ -457,12 +457,6 @@ class StateWar {
           this->points = 0;
         }
       }
-      if (code == Keyboard::Escape) {
-        // if (this->isGameOver) {
-        //   *this->state = "world";
-        //   this->isInitialized = false;
-        // }
-      }
     }
   }
 

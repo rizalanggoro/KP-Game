@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "asset.hpp"
+#include "direction.hpp"
 
 using namespace std;
 using namespace sf;
@@ -13,7 +14,7 @@ using namespace sf;
 class Fire {
  private:
   Asset *asset;
-  string fireDirection;
+  Direction fireDirection;
 
   Sprite fire{};
   CircleShape fireCollider{};
@@ -30,36 +31,36 @@ class Fire {
   void handleMovement() {
     auto dir = this->fireDirection;
     float speedX = 0, speedY = 0;
-    if (dir == "u") {
+    if (dir == DIR_UP) {
       // todo: move up
       speedY = -this->velocity;
-    } else if (dir == "d") {
+    } else if (dir == DIR_DOWN) {
       // todo: move down
       speedY = this->velocity;
-    } else if (dir == "r") {
+    } else if (dir == DIR_RIGHT) {
       // todo: move right
       speedX = this->velocity;
-    } else if (dir == "l") {
+    } else if (dir == DIR_LEFT) {
       // todo: move left
       speedX = -this->velocity;
     }
 
-    else if (dir == "ur") {
+    else if (dir == DIR_UP_RIGHT) {
       // todo: move up right
       auto speed = this->velocity * sqrt(2) / 2;
       speedX = speed;
       speedY = -speed;
-    } else if (dir == "ul") {
+    } else if (dir == DIR_UP_LEFT) {
       // todo: move up left
       auto speed = this->velocity * sqrt(2) / 2;
       speedX = -speed;
       speedY = -speed;
-    } else if (dir == "dr") {
+    } else if (dir == DIR_DOWN_RIGHT) {
       // todo: move down right
       auto speed = this->velocity * sqrt(2) / 2;
       speedX = speed;
       speedY = speed;
-    } else if (dir == "dl") {
+    } else if (dir == DIR_DOWN_LEFT) {
       // todo: move down left
       auto speed = this->velocity * sqrt(2) / 2;
       speedX = -speed;
@@ -77,28 +78,28 @@ class Fire {
   void setPosition(Vector2f position) { this->fire.setPosition(position); }
   void setVelocity(float velocity) { this->velocity = velocity; }
 
-  Fire(Asset *asset, string fireDirection) {
+  Fire(Asset *asset, Direction fireDirection) {
     this->asset = asset;
     this->fireDirection = fireDirection;
 
     // todo: set fire rotation
     auto dir = this->fireDirection;
     int angle = 0;
-    if (dir == "u")
+    if (dir == DIR_UP)
       angle = 180;
-    else if (dir == "d")
+    else if (dir == DIR_DOWN)
       angle = 0;
-    else if (dir == "r")
+    else if (dir == DIR_RIGHT)
       angle = 270;
-    else if (dir == "l")
+    else if (dir == DIR_LEFT)
       angle = 90;
-    else if (dir == "ur")
+    else if (dir == DIR_UP_RIGHT)
       angle = 180 + 45;
-    else if (dir == "ul")
+    else if (dir == DIR_UP_LEFT)
       angle = 180 - 45;
-    else if (dir == "dr")
+    else if (dir == DIR_DOWN_RIGHT)
       angle = 270 + 45;
-    else if (dir == "dl")
+    else if (dir == DIR_DOWN_LEFT)
       angle = 45;
 
     this->fire.setRotation(angle);

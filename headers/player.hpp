@@ -92,7 +92,10 @@ class Player {
   RectangleShape *getColliderDown() { return &this->colliderDown; }
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
+
+  // todo: setters
   void setMultiplier(float num) { this->velocity *num; }
+  void setPosition(float x, float y) { this->spritePlayer.setPosition(x, y); }
 
   Player(Asset *asset) {
     this->asset = asset;
@@ -128,7 +131,6 @@ class Player {
     float speed = this->velocity * sqrt(2) / 2 * this->elapsedTime;
     this->spritePlayer.move(-speed, speed);
   }
-  void setPosition(float x, float y) { this->spritePlayer.setPosition(x, y); }
 
   void draw(RenderWindow &window) {
     this->elapsedTime = this->clock.restart().asSeconds() * 60;
