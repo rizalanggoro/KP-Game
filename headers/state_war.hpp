@@ -357,7 +357,7 @@ class StateWar {
     rectLifeBg.setOutlineThickness(3);
     rectLifeBg.setOutlineColor(Color(124, 153, 159, 255));
 
-    rectLife.setFillColor(Color::Red);
+    rectLife.setFillColor(Color::Green);
     rectLife.setSize(Vector2f(this->life / this->maxLife * 256 - 6, 12 - 6));
 
     auto textPointPos = textPoint.getPosition();

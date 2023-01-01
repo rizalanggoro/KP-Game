@@ -34,11 +34,9 @@ class Asset {
 
   Texture textureBackgroundMenu{};
   Texture textureButtonClose{};
-  Texture textureButtonPlus{};
   Texture textureFire{};
   Texture textureStar{};
   Texture textureBigButton{};
-  Texture textureBackgroundPhoto{};
   Texture textureCoin{};
 
   // todo: sound assets
@@ -57,24 +55,24 @@ class Asset {
 
   void loadTexture() {
     if (this->state == "world") {
-      this->loadTextureDirt();
-      this->loadTextureBridge();
+      this->loadTextureTilesetDirt();
+      this->loadTextureTilesetBridge();
       this->loadTextureBasicCharSprite();
       this->loadGrassBiom();
-      this->loadTextureHome();
-      this->loadTextureChest();
+      this->loadTextureTilesetHome();
+      this->loadTextureTilesetChest();
     } else if (this->state == "war") {
       this->loadTextureFire();
     }
 
-    this->loadTextureGrass();
-    this->loadTextureWater();
+    this->loadTextureTilesetGrass();
+    this->loadTextureTilesetWater();
     this->loadTextureSquareButtons();
-    this->loadTextureSettingMenu();
-    this->loadTextureBoats();
+    this->loadTextureOthers();
+    this->loadTextureBoatSets();
   }
 
-  void loadTextureBoats() {
+  void loadTextureBoatSets() {
     // todo: load boat 1
     {
       string path = "assets/images/Boat 1 Set.png";
@@ -121,7 +119,7 @@ class Asset {
     }
   }
 
-  void loadTextureHome() {
+  void loadTextureTilesetHome() {
     for (int h = 0; h < 4; h++) {
       for (int w = 0; w < 3; w++) {
         string path = "assets/images/home-set (1).png";
@@ -133,18 +131,15 @@ class Asset {
     }
   }
 
-  void loadTextureSettingMenu() {
-    string path = "assets/images/Setting menu.png";
-    this->textureBackgroundMenu.loadFromFile(path);
+  void loadTextureOthers() {
+    this->textureBackgroundMenu.loadFromFile("assets/images/Setting menu.png");
     this->textureButtonClose.loadFromFile("assets/images/Button close.png");
     this->textureStar.loadFromFile("assets/images/Star.png");
-    this->textureButtonPlus.loadFromFile("assets/images/Button Plus.png");
     this->textureBigButton.loadFromFile("assets/images/UI Big Play Button.png");
-    this->textureBackgroundPhoto.loadFromFile("assets/images/Bg Photo.png");
     this->textureCoin.loadFromFile("assets/images/Coin.png");
   }
 
-  void loadTextureChest() {
+  void loadTextureTilesetChest() {
     for (int r = 0; r < 2; r++) {
       for (int c = 0; c < 5; c++) {
         auto path = "assets/images/Chest.png";
@@ -181,7 +176,7 @@ class Asset {
   }
 
   void loadTextureFire() {
-    string path = "assets/images/fire/Fire4_1.png";
+    string path = "assets/images/Fire4_1.png";
     if (this->textureFire.loadFromFile(path))
       cout << path << " loaded!" << endl;
   }
@@ -200,7 +195,7 @@ class Asset {
     }
   }
 
-  void loadTextureDirt() {
+  void loadTextureTilesetDirt() {
     int firstGid = this->state == "world" ? 93 : -1;
     int index = 0;
     for (int h = 0; h < 8; h++) {
@@ -220,7 +215,7 @@ class Asset {
     }
   }
 
-  void loadTextureBridge() {
+  void loadTextureTilesetBridge() {
     int imageHeight = 48;
     int imageWidth = 80;
 
@@ -245,7 +240,7 @@ class Asset {
     }
   }
 
-  void loadTextureGrass() {
+  void loadTextureTilesetGrass() {
     int imageHeight = 112;
     int imageWidth = 176;
 
@@ -271,7 +266,7 @@ class Asset {
     }
   }
 
-  void loadTextureWater() {
+  void loadTextureTilesetWater() {
     int imageHeight = 16;
     int imageWidth = 64;
     for (int a = 0; a < (imageWidth / 16); a++) {
@@ -347,10 +342,8 @@ class Asset {
   Texture *getTextureFire() { return &this->textureFire; }
   Texture *getTextureStar() { return &this->textureStar; }
   Texture *getTextureButtonClose() { return &this->textureButtonClose; }
-  Texture *getTextureButtonPlus() { return &this->textureButtonPlus; }
   Texture *getTextureBigButton() { return &this->textureBigButton; }
   Texture *getTextureBackgroundMenu() { return &this->textureBackgroundMenu; }
-  Texture *getTextureBackgroundPhoto() { return &this->textureBackgroundPhoto; }
   Texture *getTextureCoin() { return &this->textureCoin; }
 
   vector<Texture> *getVectorSquareButtons() {

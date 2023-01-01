@@ -27,7 +27,56 @@ class Fire {
   Clock clockMultiplier{};
   float multiplier = 1;
 
+  void handleMovement() {
+    auto dir = this->fireDirection;
+    float speedX = 0, speedY = 0;
+    if (dir == "u") {
+      // todo: move up
+      speedY = -this->velocity;
+    } else if (dir == "d") {
+      // todo: move down
+      speedY = this->velocity;
+    } else if (dir == "r") {
+      // todo: move right
+      speedX = this->velocity;
+    } else if (dir == "l") {
+      // todo: move left
+      speedX = -this->velocity;
+    }
+
+    else if (dir == "ur") {
+      // todo: move up right
+      auto speed = this->velocity * sqrt(2) / 2;
+      speedX = speed;
+      speedY = -speed;
+    } else if (dir == "ul") {
+      // todo: move up left
+      auto speed = this->velocity * sqrt(2) / 2;
+      speedX = -speed;
+      speedY = -speed;
+    } else if (dir == "dr") {
+      // todo: move down right
+      auto speed = this->velocity * sqrt(2) / 2;
+      speedX = speed;
+      speedY = speed;
+    } else if (dir == "dl") {
+      // todo: move down left
+      auto speed = this->velocity * sqrt(2) / 2;
+      speedX = -speed;
+      speedY = speed;
+    }
+    this->fire.move(speedX * this->multiplier, speedY * this->multiplier);
+  }
+
  public:
+  //  todo: getters
+  CircleShape *getFireCollider() { return &this->fireCollider; }
+  Sprite *getSprite() { return &this->fire; }
+
+  // todo: setters
+  void setPosition(Vector2f position) { this->fire.setPosition(position); }
+  void setVelocity(float velocity) { this->velocity = velocity; }
+
   Fire(Asset *asset, string fireDirection) {
     this->asset = asset;
     this->fireDirection = fireDirection;
@@ -59,10 +108,6 @@ class Fire {
     this->fireScaleFactor = this->targetFireSize / this->fireSize;
   }
 
-  Sprite *getSprite() { return &this->fire; }
-  void setPosition(Vector2f position) { this->fire.setPosition(position); }
-  // void move(float x, float y) { this->fire.move(x, y); }
-  void setVelocity(float velocity) { this->velocity = velocity; }
   void draw(RenderWindow &window) {
     // todo: handle multiplier
     this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
@@ -79,37 +124,8 @@ class Fire {
     window.draw(this->fireCollider);
 
     // todo: move fire
-    auto dir = this->fireDirection;
-    float speedX = 0, speedY = 0;
-    if (dir == "u") {
-      speedY = -this->velocity;
-    } else if (dir == "d") {
-      speedY = this->velocity;
-    } else if (dir == "r") {
-      speedX = this->velocity;
-    } else if (dir == "l") {
-      speedX = -this->velocity;
-    } else if (dir == "ur") {
-      auto speed = this->velocity * sqrt(2) / 2;
-      speedX = speed;
-      speedY = -speed;
-    } else if (dir == "ul") {
-      auto speed = this->velocity * sqrt(2) / 2;
-      speedX = -speed;
-      speedY = -speed;
-    } else if (dir == "dr") {
-      auto speed = this->velocity * sqrt(2) / 2;
-      speedX = speed;
-      speedY = speed;
-    } else if (dir == "dl") {
-      auto speed = this->velocity * sqrt(2) / 2;
-      speedX = -speed;
-      speedY = speed;
-    }
-    this->fire.move(speedX * this->multiplier, speedY * this->multiplier);
+    this->handleMovement();
   }
-
-  CircleShape *getFireCollider() { return &this->fireCollider; }
 };
 
 #endif
