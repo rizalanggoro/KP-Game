@@ -1,6 +1,7 @@
 #ifndef state_war_hpp
 #define state_war_hpp
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <iostream>
@@ -53,6 +54,11 @@ class StateWar {
   int returnTextIndex = 0;
   float returnTextInterval = 0;
 
+  Clock clockMultiplier{};
+  float multiplier = 1;
+
+  Sound soundGameOver{};
+
   void moveMap(Direction direction) {
     float mapMaxY = this->window->getSize().y -
                     this->playerBoat.getBoatTargetSize() -
@@ -64,7 +70,7 @@ class StateWar {
 
     float px = this->playerRealPos.x;
     float py = this->playerRealPos.y;
-    float pv = this->playerBoat.getVelocity();
+    float pv = this->playerBoat.getVelocity() * this->multiplier;
     float pdv = pv * sqrt(2) / 2;
 
     switch (direction) {
@@ -201,7 +207,7 @@ class StateWar {
     }
 
     if (Keyboard::isKeyPressed(Keyboard::Space)) {
-      this->playerBoat.fire();
+      if (!isGameOver) this->playerBoat.fire();
     }
   }
 
@@ -365,6 +371,7 @@ class StateWar {
 
     if (this->life <= 0) {
       this->life = 0;
+      if (!this->isGameOver) this->soundGameOver.play();
       this->isGameOver = true;
     }
   }
@@ -418,6 +425,8 @@ class StateWar {
     this->state = state;
     this->window = window;
     this->data = data;
+
+    this->soundGameOver.setBuffer(*this->asset.getSoundGameOver());
   }
 
   void handleEvent(Event &event) {
@@ -459,6 +468,8 @@ class StateWar {
 
   void run(RenderWindow &window) {
     if (!this->isInitialized) this->initialize();
+
+    this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
 
     // todo: spawn enemy boat
     if (!this->isGameOver) {

@@ -1,6 +1,7 @@
 #ifndef player_boat_hpp
 #define player_boat_hpp
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <iostream>
@@ -30,6 +31,9 @@ class PlayerBoat {
   float velocity = 5;
   float bulletVelocity = 10;
 
+  Clock clockMultiplier{};
+  float multiplier = 1;
+
   RectangleShape colliderBox{}, colliderBoxEnemy{}, colliderBoxFire{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
   RectangleShape colliderUpEnemy{}, colliderDownEnemy{}, colliderRightEnemy{},
@@ -41,6 +45,8 @@ class PlayerBoat {
   int currFrameCannonIndex = 0;
 
   int currentBoatIndex = 0;
+
+  Sound soundBullet{};
 
   int parseDirection(string dir) {
     int angle = 0;
@@ -68,6 +74,7 @@ class PlayerBoat {
   void setBulletVelocity(float bulletVelocity) {
     this->bulletVelocity = bulletVelocity;
   }
+  void setMultiplier(float multiplier) { this->multiplier = multiplier; }
   float getBulletVelocity() { return this->bulletVelocity; }
   float getBoatTargetSize() { return this->boatTargetSize; }
   Sprite *getSprite() { return &this->player; }
@@ -83,39 +90,39 @@ class PlayerBoat {
 
   void moveUpRight() {
     this->playerDirection = "ur";
-    auto speed = this->velocity * sqrt(2) / 2;
+    auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(speed, -speed);
   }
   void moveUpLeft() {
     this->playerDirection = "ul";
-    auto speed = this->velocity * sqrt(2) / 2;
+    auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(-speed, -speed);
   }
   void moveDownRight() {
     this->playerDirection = "dr";
-    auto speed = this->velocity * sqrt(2) / 2;
+    auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(speed, speed);
   }
   void moveDownLeft() {
     this->playerDirection = "dl";
-    auto speed = this->velocity * sqrt(2) / 2;
+    auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
     this->player.move(-speed, speed);
   }
   void moveUp() {
     this->playerDirection = "u";
-    this->player.move(0, -this->velocity);
+    this->player.move(0, -this->velocity * this->multiplier);
   }
   void moveDown() {
     this->playerDirection = "d";
-    this->player.move(0, this->velocity);
+    this->player.move(0, this->velocity * this->multiplier);
   }
   void moveRight() {
     this->playerDirection = "r";
-    this->player.move(this->velocity, 0);
+    this->player.move(this->velocity * this->multiplier, 0);
   }
   void moveLeft() {
     this->playerDirection = "l";
-    this->player.move(-this->velocity, 0);
+    this->player.move(-this->velocity * this->multiplier, 0);
   }
 
   void unfire() { this->currFrameCannonIndex = 0; }
@@ -139,6 +146,8 @@ class PlayerBoat {
         newFire.setVelocity(this->bulletVelocity);
 
         this->vectorFire.push_back(newFire);
+
+        this->soundBullet.play();
       }
 
       this->clockFrameCannon.restart();
@@ -150,17 +159,15 @@ class PlayerBoat {
     this->tilemap = tilemap;
 
     this->boatScaleFactor = this->boatTargetSize / this->boatSize;
-
-    // this->boatCannonTargetSize = this->boatTargetSize / 2;
-    // this->playerCannon.setTexture(this->asset->getVectorCannon4()->at(0));
-    // this->boatCannonSize = this->playerCannon.getGlobalBounds().width;
-    // this->boatCannonScaleFactor =
-    //     this->boatCannonTargetSize / this->boatCannonSize;
+    this->soundBullet.setBuffer(*this->asset->getSoundBullet());
   }
 
   void setLevel(int level) { this->boatLevel = level; }
 
   void draw(RenderWindow &window) {
+    // todo: init multiplier
+    this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
+
     // todo: draw boat
     this->player.setTexture(this->asset->getVectorBoats()
                                 ->at(this->boatLevel - 1)

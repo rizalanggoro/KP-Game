@@ -1,6 +1,7 @@
 #ifndef player_hpp
 #define player_hpp
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -32,19 +33,52 @@ class Player {
   RectangleShape rectColliderBox{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
 
+  Sound soundWalk{};
+
+  void playSoundWalk() {
+    if (this->soundWalk.getStatus() != 2) this->soundWalk.play();
+  }
+
   void handleKeyboard() {
-    if (Keyboard::isKeyPressed(Keyboard::Down)) {
-      this->isPlayerIdle = false;
-      this->frameDirIndex = 0;
-    } else if (Keyboard::isKeyPressed(Keyboard::Up)) {
-      this->isPlayerIdle = false;
-      this->frameDirIndex = 1;
-    } else if (Keyboard::isKeyPressed(Keyboard::Left)) {
-      this->isPlayerIdle = false;
-      this->frameDirIndex = 2;
-    } else if (Keyboard::isKeyPressed(Keyboard::Right)) {
+    bool keyUp = Keyboard::isKeyPressed(Keyboard::Up);
+    bool keyDown = Keyboard::isKeyPressed(Keyboard::Down);
+    bool keyRight = Keyboard::isKeyPressed(Keyboard::Right);
+    bool keyLeft = Keyboard::isKeyPressed(Keyboard::Left);
+
+    if (keyUp && keyRight) {
       this->isPlayerIdle = false;
       this->frameDirIndex = 3;
+      this->playSoundWalk();
+    } else if (keyUp && keyLeft) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 2;
+      this->playSoundWalk();
+    } else if (keyDown && keyRight) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 3;
+      this->playSoundWalk();
+    } else if (keyDown && keyLeft) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 2;
+      this->playSoundWalk();
+    }
+
+    else if (keyDown) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 0;
+      this->playSoundWalk();
+    } else if (keyUp) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 1;
+      this->playSoundWalk();
+    } else if (keyLeft) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 2;
+      this->playSoundWalk();
+    } else if (keyRight) {
+      this->isPlayerIdle = false;
+      this->frameDirIndex = 3;
+      this->playSoundWalk();
     }
   }
 
@@ -63,6 +97,7 @@ class Player {
   Player(Asset *asset) {
     this->asset = asset;
     this->playerScaleFactor = this->playerTargetSize / this->playerSize;
+    this->soundWalk.setBuffer(*this->asset->getSoundGrassWalk());
   }
 
   void moveUp() {

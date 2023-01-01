@@ -40,6 +40,9 @@ class EnemyBoat {
 
   vector<Fire> vectorFire{};
 
+  Clock clockMultiplier{};
+  float multiplier = 1;
+
   void fire(string dir) {
     this->fireInterval = this->clockFire.getElapsedTime().asMilliseconds();
 
@@ -88,6 +91,9 @@ class EnemyBoat {
   }
 
   void draw(RenderWindow &window) {
+    // todo: handle multiplier
+    this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
+
     this->enemy.setTexture(this->asset->getVectorBoats()
                                ->at(this->boatLevel)
                                .at(this->fireFrameIndex));
@@ -171,7 +177,7 @@ class EnemyBoat {
         if (dx < this->enemyVelocity)
           this->enemy.setPosition(playerPos.x, enemyPos.y);
         else
-          this->enemy.move(this->enemyVelocity, 0);
+          this->enemy.move(this->enemyVelocity * this->multiplier, 0);
       }
     } else if (enemyPos.x > playerPos.x &&
                this->tilemap->canMove(&this->colliderLeft)) {
@@ -188,7 +194,7 @@ class EnemyBoat {
         if (dx > this->enemyVelocity)
           this->enemy.setPosition(playerPos.x, enemyPos.y);
         else
-          this->enemy.move(-this->enemyVelocity, 0);
+          this->enemy.move(-this->enemyVelocity * this->multiplier, 0);
       }
     } else if (enemyPos.y < playerPos.y &&
                this->tilemap->canMove(&this->colliderDown)) {
@@ -204,7 +210,7 @@ class EnemyBoat {
         if (dy < this->enemyVelocity)
           this->enemy.setPosition(enemyPos.x, playerPos.y);
         else
-          this->enemy.move(0, this->enemyVelocity);
+          this->enemy.move(0, this->enemyVelocity * this->multiplier);
       }
     } else if (enemyPos.y > playerPos.y &&
                this->tilemap->canMove(&this->colliderUp)) {
@@ -221,7 +227,7 @@ class EnemyBoat {
         if (dy > this->enemyVelocity)
           this->enemy.setPosition(enemyPos.x, playerPos.y);
         else
-          this->enemy.move(0, -this->enemyVelocity);
+          this->enemy.move(0, -this->enemyVelocity * this->multiplier);
       }
     }
 

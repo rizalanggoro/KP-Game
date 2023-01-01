@@ -8,6 +8,7 @@
     "xhash": "cpp",
     "ostream": "cpp",
     "memory": "cpp",
-    "iosfwd": "cpp"
+    "iosfwd": "cpp",
+    "iostream": "cpp"
   }
 }

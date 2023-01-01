@@ -4,7 +4,7 @@ CLEAR_TERMINAL=
 
 # ---------------------------------------------------- #
 CC=g++
-LIB_FLAGS=-lsfml-graphics -lsfml-window -lsfml-system
+LIB_FLAGS=-lsfml-graphics -lsfml-audio -lsfml-window -lsfml-system
 # SOURCES=main.cpp sources/*.cpp
 # OBJECTS_1=$(SOURCES:.cpp=.o)
 # OBJECTS_2=$(OBJECTS_1:sources/*.o=*.o)

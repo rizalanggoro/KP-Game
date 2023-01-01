@@ -1,6 +1,7 @@
 #ifndef asset_hpp
 #define asset_hpp
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <fstream>
@@ -39,6 +40,15 @@ class Asset {
   Texture textureBigButton{};
   Texture textureBackgroundPhoto{};
   Texture textureCoin{};
+
+  // todo: sound assets
+  SoundBuffer soundBullet{}, soundGrassWalk{}, soundGameOver{};
+
+  void loadSounds() {
+    this->soundBullet.loadFromFile("assets/sounds/lmg_fire01.wav");
+    this->soundGrassWalk.loadFromFile("assets/sounds/Step_grass.wav");
+    this->soundGameOver.loadFromFile("assets/sounds/game-over.wav");
+  }
 
   void loadFont() {
     string path = "assets/fonts/PressStart2P-Regular.ttf";
@@ -310,10 +320,18 @@ class Asset {
     this->loadMapJson();
     this->loadTexture();
     this->loadFont();
+    this->loadSounds();
   }
 
+  // todo: sound assets
+  SoundBuffer *getSoundBullet() { return &this->soundBullet; }
+  SoundBuffer *getSoundGrassWalk() { return &this->soundGrassWalk; }
+  SoundBuffer *getSoundGameOver() { return &this->soundGameOver; }
+
+  // todo: font assets
   Font *getFont() { return &this->font; }
 
+  // todo: texture assets
   vector<Texture> *getVectorWater() { return &vectorWater; };
   vector<Texture> *getVectorGrass() { return &vectorGrass; };
   vector<Texture> *getVectorWoodBridge() { return &vectorWoodBridge; };

@@ -24,6 +24,9 @@ class Fire {
   float fireSize = 0;
   float fireScaleFactor = 1;
 
+  Clock clockMultiplier{};
+  float multiplier = 1;
+
  public:
   Fire(Asset *asset, string fireDirection) {
     this->asset = asset;
@@ -61,8 +64,10 @@ class Fire {
   // void move(float x, float y) { this->fire.move(x, y); }
   void setVelocity(float velocity) { this->velocity = velocity; }
   void draw(RenderWindow &window) {
-    // todo: draw fire
+    // todo: handle multiplier
+    this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
 
+    // todo: draw fire
     this->fire.setOrigin(128 / 2, 128 / 2);
     this->fire.setScale(this->fireScaleFactor, this->fireScaleFactor);
     window.draw(this->fire);
@@ -101,7 +106,7 @@ class Fire {
       speedX = -speed;
       speedY = speed;
     }
-    this->fire.move(speedX, speedY);
+    this->fire.move(speedX * this->multiplier, speedY * this->multiplier);
   }
 
   CircleShape *getFireCollider() { return &this->fireCollider; }
