@@ -10,8 +10,7 @@ using namespace sf;
 using namespace std;
 
 int main() {
-  RenderWindow window(VideoMode(1280, 720), "SFML | Game Fix InsyaAllah",
-                      Style::Close);
+  RenderWindow window(VideoMode(1280, 720), "VILLAGE'S WARSHIPS", Style::Close);
   // window.setFramerateLimit(60);
 
   string state = "world";

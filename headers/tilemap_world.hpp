@@ -9,8 +9,6 @@
 #include "json.hpp"
 #include "player.hpp"
 
-// #define DEBUG
-
 using namespace std;
 using namespace sf;
 using json = nlohmann::json;

@@ -1,6 +1,7 @@
 #ifndef state_world_hpp
 #define state_world_hpp
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <fstream>
@@ -44,6 +45,8 @@ class StateWorld {
 
   Clock clockFramerate{};
   float multiplier = 1;
+
+  Sound backsoundWorld{}, soundClick{};
 
   void moveMap(Direction direction) {
     float mapMaxY = this->window->getSize().y - 48 - this->colliderMapSize;
@@ -466,6 +469,11 @@ class StateWorld {
     this->window = window;
     this->data = data;
 
+    this->soundClick.setBuffer(*this->asset.getSoundClick());
+    this->backsoundWorld.setBuffer(*this->asset.getBacksoundWorld());
+    this->backsoundWorld.setLoop(true);
+    this->backsoundWorld.setVolume(40);
+
     view = window->getDefaultView();
     view.setCenter(0, 0);
     this->viewGui = window->getDefaultView();
@@ -493,6 +501,7 @@ class StateWorld {
       auto code = event.key.code;
       if (code == Keyboard::Enter) {
         if (this->isInWarPoint) {
+          this->backsoundWorld.stop();
           *this->state = "war";
         }
         if (this->isInShopPoint) {
@@ -515,18 +524,28 @@ class StateWorld {
       auto my = this->mouseRealPos.y;
       if (this->buttonClose.getGlobalBounds().contains(mx, my)) {
         this->isShopOpenned = false;
+        this->soundClick.play();
       }
 
-      if (this->buttonBoat1.getGlobalBounds().contains(mx, my))
+      if (this->buttonBoat1.getGlobalBounds().contains(mx, my)) {
         this->shopSelectedBoatIndex = 0;
-      if (this->buttonBoat2.getGlobalBounds().contains(mx, my))
+        this->soundClick.play();
+      }
+      if (this->buttonBoat2.getGlobalBounds().contains(mx, my)) {
         this->shopSelectedBoatIndex = 1;
-      if (this->buttonBoat3.getGlobalBounds().contains(mx, my))
+        this->soundClick.play();
+      }
+      if (this->buttonBoat3.getGlobalBounds().contains(mx, my)) {
         this->shopSelectedBoatIndex = 2;
-      if (this->buttonBoat4.getGlobalBounds().contains(mx, my))
+        this->soundClick.play();
+      }
+      if (this->buttonBoat4.getGlobalBounds().contains(mx, my)) {
         this->shopSelectedBoatIndex = 3;
+        this->soundClick.play();
+      }
 
       if (this->buttonAction.getGlobalBounds().contains(mx, my)) {
+        this->soundClick.play();
         cout << "button action clicked" << endl;
         bool isActionUse =
             (*this->data->getJsonBoats())["boats"][this->shopSelectedBoatIndex]
@@ -564,6 +583,8 @@ class StateWorld {
   }
 
   void run(RenderWindow &window) {
+    if (this->backsoundWorld.getStatus() != 2) this->backsoundWorld.play();
+
     this->multiplier = this->clockFramerate.restart().asSeconds() * 60;
     this->mouseRealPos = Mouse::getPosition(window);
 

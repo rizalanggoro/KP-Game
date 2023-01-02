@@ -57,7 +57,7 @@ class StateWar {
   Clock clockMultiplier{};
   float multiplier = 1;
 
-  Sound soundGameOver{};
+  Sound soundGameOver{}, backsoundWar{};
 
   void moveMap(Direction direction) {
     float mapMaxY = this->window->getSize().y -
@@ -372,6 +372,7 @@ class StateWar {
     if (this->life <= 0) {
       this->life = 0;
       if (!this->isGameOver) this->soundGameOver.play();
+      if (!this->isGameOver) this->backsoundWar.stop();
       this->isGameOver = true;
     }
   }
@@ -418,6 +419,8 @@ class StateWar {
     this->playerBoat.setLevel(this->boatLevel);
     this->playerBoat.setVelocity(this->boatVelocity);
     this->playerBoat.setBulletVelocity(this->bulletVelocity);
+
+    this->backsoundWar.play();
   }
 
  public:
@@ -427,6 +430,9 @@ class StateWar {
     this->data = data;
 
     this->soundGameOver.setBuffer(*this->asset.getSoundGameOver());
+    this->backsoundWar.setBuffer(*this->asset.getBacksoundWar());
+    this->backsoundWar.setLoop(true);
+    this->backsoundWar.setVolume(40);
   }
 
   void handleEvent(Event &event) {

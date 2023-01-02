@@ -40,12 +40,16 @@ class Asset {
   Texture textureCoin{};
 
   // todo: sound assets
-  SoundBuffer soundBullet{}, soundGrassWalk{}, soundGameOver{};
+  SoundBuffer soundBullet{}, soundGrassWalk{}, soundGameOver{}, backsoundWar{},
+      backsoundWorld{}, soundClick{};
 
   void loadSounds() {
     this->soundBullet.loadFromFile("assets/sounds/lmg_fire01.wav");
     this->soundGrassWalk.loadFromFile("assets/sounds/Step_grass.wav");
     this->soundGameOver.loadFromFile("assets/sounds/game-over.wav");
+    this->backsoundWar.loadFromFile("assets/sounds/worldwar_aftercut.wav");
+    this->backsoundWorld.loadFromFile("assets/sounds/worldmenu_aftercut.wav");
+    this->soundClick.loadFromFile("assets/sounds/menuUpgradeDll_aftercut1.wav");
   }
 
   void loadFont() {
@@ -322,6 +326,9 @@ class Asset {
   SoundBuffer *getSoundBullet() { return &this->soundBullet; }
   SoundBuffer *getSoundGrassWalk() { return &this->soundGrassWalk; }
   SoundBuffer *getSoundGameOver() { return &this->soundGameOver; }
+  SoundBuffer *getSoundClick() { return &this->soundClick; }
+  SoundBuffer *getBacksoundWar() { return &this->backsoundWar; }
+  SoundBuffer *getBacksoundWorld() { return &this->backsoundWorld; }
 
   // todo: font assets
   Font *getFont() { return &this->font; }
