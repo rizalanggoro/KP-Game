@@ -103,6 +103,7 @@ class TilemapWar {
   }
 
  public:
+  //  todo: getters
   int getWidth() { return this->width; }
   int getHeight() { return this->height; }
   float getTileTargetSize() { return this->tileTargetSize; }

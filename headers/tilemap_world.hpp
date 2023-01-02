@@ -94,6 +94,7 @@ class Tilemap {
   }
 
  public:
+  //  todo: getters
   int getHeight() { return height; }
   int getWidth() { return width; }
   float getTileTargetSize() { return this->tileTargetSize; }

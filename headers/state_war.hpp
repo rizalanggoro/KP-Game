@@ -278,34 +278,6 @@ class StateWar {
     textReturn.setPosition(wCenter.x - textReturnBounds.width / 2,
                            wSize.y - 48 - textReturnBounds.height);
     window.draw(textReturn);
-
-    // todo: draw button back
-    // Sprite bgButton{};
-    // bgButton.setTexture(*this->asset.getTextureBigButton());
-    // bgButton.setScale(64 / 27, 64 / 27);
-
-    // auto totalPointPos = totalPoint.getPosition();
-    // auto bgButtonBounds = bgButton.getGlobalBounds();
-    // bgButton.setPosition(wCenter.x - bgButtonBounds.width / 2,
-    //                      wSize.y - bgButtonBounds.height - 48);
-
-    // window.draw(bgButton);
-
-    // todo: draw text button back
-    // Text textButtonBack{};
-    // textButtonBack.setString("RETURN");
-    // textButtonBack.setFont(*this->asset.getFont());
-    // textButtonBack.setCharacterSize(16);
-    // textButtonBack.setFillColor(Color(182, 137, 98, 255));
-
-    // auto bgButtonPos = bgButton.getPosition();
-    // auto textButtonBackBounds = textButtonBack.getGlobalBounds();
-    // textButtonBack.setPosition(
-    //     bgButtonPos.x + (bgButtonBounds.width - textButtonBackBounds.width) /
-    //     2, bgButtonPos.y +
-    //         (bgButtonBounds.height - textButtonBackBounds.height) * 2 / 5);
-
-    // window.draw(textButtonBack);
   }
 
   void drawGuiBoatStats(RenderWindow &window) {
