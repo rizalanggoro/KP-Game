@@ -588,8 +588,6 @@ class StateWorld {
     this->multiplier = this->clockFramerate.restart().asSeconds() * 60;
     this->mouseRealPos = Mouse::getPosition(window);
 
-    this->player.setMultiplier(this->multiplier);
-
     if (!this->isConfirmExitShowed && !this->isShopOpenned) {
       this->handleKeyboard();
     }

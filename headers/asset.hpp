@@ -17,8 +17,10 @@ class Asset {
  private:
   string state;
 
+  // todo: font
   Font font{};
 
+  // todo: images
   vector<int> vectorContainGrass{}, vectorContainDirt{}, vectorContainBridge{};
   vector<Texture> vectorWater{}, vectorGrass{}, vectorWoodBridge{},
       vectorDirt{};

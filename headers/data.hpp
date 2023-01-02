@@ -32,6 +32,8 @@ class Data {
     fileBoats << this->jsonBoats << endl;
     fileProfile << this->jsonProfile << endl;
   }
+
+  // todo: getters
   json *getJsonBoats() { return &this->jsonBoats; }
   json *getJsonProfile() { return &this->jsonProfile; }
 };

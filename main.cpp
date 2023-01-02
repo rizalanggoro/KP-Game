@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#include "headers/asset.hpp"
 #include "headers/data.hpp"
 #include "headers/state_war.hpp"
 #include "headers/state_world.hpp"
@@ -11,7 +10,6 @@ using namespace std;
 
 int main() {
   RenderWindow window(VideoMode(1280, 720), "VILLAGE'S WARSHIPS", Style::Close);
-  // window.setFramerateLimit(60);
 
   string state = "world";
   Data data{};

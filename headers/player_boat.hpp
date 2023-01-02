@@ -64,21 +64,12 @@ class PlayerBoat {
   }
 
  public:
+  //  todo: getters
   RectangleShape *getColliderBoxFire() { return &this->colliderBoxFire; }
   RectangleShape *getColliderUpEnemy() { return &this->colliderUpEnemy; }
   RectangleShape *getColliderDownEnemy() { return &this->colliderDownEnemy; }
   RectangleShape *getColliderRightEnemy() { return &this->colliderRightEnemy; }
   RectangleShape *getColliderLeftEnemy() { return &this->colliderLeftEnemy; }
-
-  float getVelocity() { return this->velocity; }
-  void setVelocity(float velocity) { this->velocity = velocity; }
-  void setBulletVelocity(float bulletVelocity) {
-    this->bulletVelocity = bulletVelocity;
-  }
-  void setMultiplier(float multiplier) { this->multiplier = multiplier; }
-  float getBulletVelocity() { return this->bulletVelocity; }
-  float getBoatTargetSize() { return this->boatTargetSize; }
-  Sprite *getSprite() { return &this->player; }
 
   RectangleShape *getColliderBox() { return &this->colliderBox; };
   RectangleShape *getColliderUp() { return &this->colliderUp; }
@@ -86,8 +77,21 @@ class PlayerBoat {
   RectangleShape *getColliderRight() { return &this->colliderRight; }
   RectangleShape *getColliderLeft() { return &this->colliderLeft; }
 
-  int getCurrentBoatIndex() { return this->currentBoatIndex; }
+  Sprite *getSprite() { return &this->player; }
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
+
+  int getCurrentBoatIndex() { return this->currentBoatIndex; }
+  float getVelocity() { return this->velocity; }
+  float getBulletVelocity() { return this->bulletVelocity; }
+  float getBoatTargetSize() { return this->boatTargetSize; }
+
+  // todo: setters
+  void setVelocity(float velocity) { this->velocity = velocity; }
+  void setBulletVelocity(float bulletVelocity) {
+    this->bulletVelocity = bulletVelocity;
+  }
+  void setMultiplier(float multiplier) { this->multiplier = multiplier; }
+  void setLevel(int level) { this->boatLevel = level; }
 
   void moveUpRight() {
     this->playerDirection = DIR_UP_RIGHT;
@@ -162,8 +166,6 @@ class PlayerBoat {
     this->boatScaleFactor = this->boatTargetSize / this->boatSize;
     this->soundBullet.setBuffer(*this->asset->getSoundBullet());
   }
-
-  void setLevel(int level) { this->boatLevel = level; }
 
   void draw(RenderWindow &window) {
     // todo: init multiplier

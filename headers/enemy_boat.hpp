@@ -72,10 +72,12 @@ class EnemyBoat {
  public:
   // todo: getters
   RectangleShape *getColliderFire() { return &this->colliderFire; }
-  int getHp() { return this->hp; }
-  void decreaseHp(int num) { this->hp -= num; }
   vector<Fire> *getVectorFire() { return &this->vectorFire; }
+  int getHp() { return this->hp; }
+
+  // todo: setters
   void setBoatLevel(int level) { this->boatLevel = level; }
+  void decreaseHp(int num) { this->hp -= num; }
 
   EnemyBoat(Asset *asset, TilemapWar *tilemap, PlayerBoat *playerBoat) {
     this->asset = asset;
