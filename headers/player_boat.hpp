@@ -16,12 +16,18 @@ using namespace sf;
 
 class PlayerBoat {
  private:
+  // untuk memberi texture yang diambil dari class asset
   Asset *asset;
+  // untuk mendeteksi tabrakan pulau
   TilemapWar *tilemap;
 
+  // object yang akan digambar & diberi texture
   Sprite player{};
+
+  // vector peluru
   vector<Fire> vectorFire{};
 
+  // sebagai penunjuk arah gerak kapal dan peluru
   Direction playerDirection = DIR_RIGHT;
   int boatLevel = 1;
 
@@ -29,26 +35,39 @@ class PlayerBoat {
   float boatTargetSize = 80;
   float boatScaleFactor = 1;
 
+  // kecepatan kapal
   float velocity = 5;
+
+  // kecepatan peluru
   float bulletVelocity = 10;
 
+  // agar kapal dapat berjalan mulus pada fps rendah maupun tinggi
   Clock clockMultiplier{};
   float multiplier = 1;
 
+  // untuk mendeteksi tabrakan dengan pulau
+  // dan untuk mendeteksi apakah kapal musuh sudah dekat
   RectangleShape colliderBox{}, colliderBoxEnemy{}, colliderBoxFire{};
   RectangleShape colliderUp{}, colliderDown{}, colliderRight{}, colliderLeft{};
+  // jika kapal musuh sudah menabrak collider u d r l enemy, maka kapal musuh
+  // akan mengeluarkan peluru
   RectangleShape colliderUpEnemy{}, colliderDownEnemy{}, colliderRightEnemy{},
       colliderLeftEnemy{};
 
+  // untuk mengatur frame animasi tembakan
   Clock clockFrameCannon{};
-  float frameCannonDelay = 250;
+  float frameCannonDelay =
+      250;  // dalam ms, jadi dalam 1 detik (1000 ms) keluar 4 peluru
   float frameCannonInterval = 0;
   int currFrameCannonIndex = 0;
 
+  // -
   int currentBoatIndex = 0;
 
+  // sebagai suara tembakan
   Sound soundBullet{};
 
+  // fungsi untuk mengatur rotasi kapal
   int parseDirection(Direction dir) {
     int angle = 0;
     if (dir == DIR_UP_RIGHT) angle = 225;
@@ -64,7 +83,9 @@ class PlayerBoat {
   }
 
  public:
-  //  todo: getters
+  // todo: getters
+  // untuk mengambil properti yang ada di class PlayerBoat (int) untuk
+  // digunakan di class-class lainnya
   RectangleShape *getColliderBoxFire() { return &this->colliderBoxFire; }
   RectangleShape *getColliderUpEnemy() { return &this->colliderUpEnemy; }
   RectangleShape *getColliderDownEnemy() { return &this->colliderDownEnemy; }
@@ -86,6 +107,7 @@ class PlayerBoat {
   float getBoatTargetSize() { return this->boatTargetSize; }
 
   // todo: setters
+  // untuk menyetel properti yang ada di class ini
   void setVelocity(float velocity) { this->velocity = velocity; }
   void setBulletVelocity(float bulletVelocity) {
     this->bulletVelocity = bulletVelocity;
@@ -93,6 +115,7 @@ class PlayerBoat {
   void setMultiplier(float multiplier) { this->multiplier = multiplier; }
   void setLevel(int level) { this->boatLevel = level; }
 
+  // fungsi-fungsi untuk menggerakkan kapal sesuai dengan arah
   void moveUpRight() {
     this->playerDirection = DIR_UP_RIGHT;
     auto speed = this->velocity * sqrt(2) / 2 * this->multiplier;
@@ -130,8 +153,10 @@ class PlayerBoat {
     this->player.move(-this->velocity * this->multiplier, 0);
   }
 
+  // jika tombol space berhenti ditekan, maka animasi tembakan di reset
   void unfire() { this->currFrameCannonIndex = 0; }
 
+  // fungsi untuk menembak
   void fire() {
     this->frameCannonInterval =
         this->clockFrameCannon.getElapsedTime().asMilliseconds();
@@ -146,12 +171,14 @@ class PlayerBoat {
         this->currFrameCannonIndex = 0;
 
         auto playerPos = this->player.getPosition();
+        // menambahkan object peluru baru ke dalam vector
         Fire newFire{this->asset, this->playerDirection};
         newFire.setPosition(Vector2f(playerPos.x, playerPos.y));
         newFire.setVelocity(this->bulletVelocity);
 
         this->vectorFire.push_back(newFire);
 
+        // memainkan sfx tembakan
         this->soundBullet.play();
       }
 
@@ -163,7 +190,9 @@ class PlayerBoat {
     this->asset = asset;
     this->tilemap = tilemap;
 
+    // untuk menghitung skala agar kapal menjadi ukuran 80 (target)
     this->boatScaleFactor = this->boatTargetSize / this->boatSize;
+    // menyetel sfx dengan buffer yang didapatkan dari class asset
     this->soundBullet.setBuffer(*this->asset->getSoundBullet());
   }
 
@@ -172,16 +201,21 @@ class PlayerBoat {
     this->multiplier = this->clockMultiplier.restart().asSeconds() * 60;
 
     // todo: draw boat
+    // menyetel texture object yang diambil dari class asset
     this->player.setTexture(this->asset->getVectorBoats()
                                 ->at(this->boatLevel - 1)
                                 .at(this->currFrameCannonIndex));
+    // mengatur titik awal agar titik rotasi berada di tengah
     this->player.setOrigin(this->boatSize / 2, this->boatSize / 2);
+    // mengatur rotasi
     this->player.setRotation(this->parseDirection(this->playerDirection));
+    // mengatur skala
     this->player.setScale(this->boatScaleFactor, this->boatScaleFactor);
-
+    // menggambar object di window
     window.draw(this->player);
 
     // todo: draw rect
+    // menggambar batas untuk mendeteksi tabrakan dengan pulau
     auto playerPos = this->player.getPosition();
     this->colliderBox.setFillColor(Color::Transparent);
     this->colliderBox.setPosition(playerPos.x - this->boatTargetSize / 2,
@@ -235,6 +269,8 @@ class PlayerBoat {
     window.draw(this->colliderBoxEnemy);
 
     // todo: draw collider enemy
+    // sebagai pendeteksi apakah musuh sudah dekat dengan kapal player
+    // sehingga musuh bisa mengeluarkan peluru
     auto hColliderEnemySize =
         Vector2f(this->boatTargetSize * 4, this->boatTargetSize * 2);
     auto vColliderEnemySize =
@@ -269,6 +305,7 @@ class PlayerBoat {
     window.draw(this->colliderLeftEnemy);
 
     // todo: draw collider box fire
+    // untuk mendeteksi tabrakan peluru musuh dengan kapal player
     this->colliderBoxFire.setFillColor(Color::Transparent);
     this->colliderBoxFire.setOutlineThickness(-2);
     this->colliderBoxFire.setOutlineColor(Color::Transparent);
@@ -293,6 +330,7 @@ class PlayerBoat {
     window.draw(this->colliderBoxFire);
 
     // todo: draw fire
+    // untuk menggambar seluruh peluru yang ada di vector fire
     for (int a = 0; a < this->vectorFire.size(); a++) {
       Fire *fire = &this->vectorFire.at(a);
       fire->draw(window);

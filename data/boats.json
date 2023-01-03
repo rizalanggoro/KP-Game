@@ -1,1 +1,1 @@
-{"boats":[{"levels":[2,2,2,1],"owned":true,"price":0,"values":[7,1,5,100]},{"levels":[2,3,2,2],"owned":true,"price":300,"values":[7,3,5,100]},{"levels":[3,4,3,3],"owned":false,"price":600,"values":[10,4,7,300]},{"levels":[5,5,5,5],"owned":false,"price":1200,"values":[15,5,10,500]}]}
+{"boats":[{"levels":[2,2,2,1],"owned":true,"price":0,"values":[7,1,5,100]},{"levels":[2,3,2,2],"owned":true,"price":300,"values":[7,3,5,100]},{"levels":[3,4,3,3],"owned":true,"price":600,"values":[10,4,7,300]},{"levels":[5,5,5,5],"owned":true,"price":1200,"values":[15,5,10,500]}]}
