@@ -14,13 +14,16 @@ using namespace sf;
 using json = nlohmann::json;
 
 /*
-
+  class ini digunakan sebagai manajemen asset seperti font, sound, dan texture /
+  image
 */
 
 class Asset {
  private:
   string state;
 
+  // berikut adalah properti yang digunakan sebagai penampung font, gambar, dan
+  // sound yang akan dimuat dari folder asset
   // todo: font
   Font font{};
 
@@ -49,6 +52,7 @@ class Asset {
   SoundBuffer soundBullet{}, soundGrassWalk{}, soundGameOver{}, backsoundWar{},
       backsoundWorld{}, soundClick{};
 
+  // fungsi untuk memuat sound
   void loadSounds() {
     this->soundBullet.loadFromFile("assets/sounds/lmg_fire01.wav");
     this->soundGrassWalk.loadFromFile("assets/sounds/Step_grass.wav");
@@ -58,11 +62,13 @@ class Asset {
     this->soundClick.loadFromFile("assets/sounds/menuUpgradeDll_aftercut1.wav");
   }
 
+  // fungsi untuk memuat font
   void loadFont() {
     string path = "assets/fonts/PressStart2P-Regular.ttf";
     if (this->font.loadFromFile(path)) cout << "font loaded!" << endl;
   }
 
+  // fungsi untuk memuat texture
   void loadTexture() {
     if (this->state == "world") {
       this->loadTextureTilesetDirt();
@@ -327,6 +333,9 @@ class Asset {
     this->loadFont();
     this->loadSounds();
   }
+
+  // berikut adalah kode getters
+  // yang akan dipakai pada class lainnya
 
   // todo: sound assets
   SoundBuffer *getSoundBullet() { return &this->soundBullet; }
