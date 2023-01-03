@@ -13,6 +13,10 @@ using namespace std;
 using namespace sf;
 using json = nlohmann::json;
 
+/*
+
+*/
+
 class Asset {
  private:
   string state;
