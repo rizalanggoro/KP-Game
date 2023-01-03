@@ -1,5 +1,6 @@
 #pragma once
 
+// enum yang digunakan sebagai penentu arah gerak kapal dan arah tembakan
 enum Direction {
   DIR_UP,
   DIR_DOWN,
