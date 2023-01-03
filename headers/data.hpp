@@ -18,6 +18,7 @@ class Data {
   string pathProfile = "data/profile.json";
 
  public:
+  // fungsi untuk memuat data profile dan data kapal dari file .json
   void load() {
     ifstream fileBoats(pathBoats);
     ifstream fileProfile(pathProfile);
@@ -25,6 +26,8 @@ class Data {
     this->jsonBoats = json::parse(fileBoats);
     this->jsonProfile = json::parse(fileProfile);
   }
+
+  // fungsi untuk menyimpan data profile dan data kapal ke file .json
   void save() {
     ofstream fileBoats(pathBoats);
     ofstream fileProfile(pathProfile);
